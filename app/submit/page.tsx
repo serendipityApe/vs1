@@ -46,12 +46,12 @@ export default function SubmitPage() {
         <Card className="max-w-md w-full">
           <CardBody className="text-center p-8">
             <div className="text-6xl mb-4">🔒</div>
-            <h1 className="text-2xl font-bold mb-4">需要登录</h1>
+            <h1 className="text-2xl font-bold mb-4">Login Required</h1>
             <p className="text-foreground-600 mb-6">
-              请先登录才能提交你的垃圾项目
+              Please log in to submit your shit project
             </p>
             <Button as={Link} color="primary" href="/api/auth/signin" size="lg">
-              GitHub 登录
+              Login with GitHub
             </Button>
           </CardBody>
         </Card>
@@ -117,16 +117,19 @@ export default function SubmitPage() {
       const data = await response.json();
 
       if (data.success) {
-        showSuccessToast("提交成功！", "你的垃圾项目已成功提交");
+        showSuccessToast(
+          "Submission Success!",
+          "Your shit project has been submitted successfully"
+        );
         router.push(`/projects/${data.project.id}`);
       } else {
         handleApiError(
           { response: { status: 400, data: { message: data.errors?.[0] } } },
-          data.errors?.[0] || "提交失败",
+          data.errors?.[0] || "Submission failed"
         );
       }
     } catch (error) {
-      handleApiError(error, "提交失败");
+      handleApiError(error, "Submission failed");
     } finally {
       setIsLoading(false);
     }
@@ -161,9 +164,9 @@ export default function SubmitPage() {
             <Input
               isRequired
               description={`${formData.title.length}/100 字符`}
-              label="项目名称 *"
+              label="Project Name *"
               maxLength={100}
-              placeholder="比如：AI食谱生成器只会做三明治"
+              placeholder="e.g., AI Recipe Generator That Only Makes Sandwiches"
               value={formData.title}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, title: e.target.value }))
@@ -172,10 +175,10 @@ export default function SubmitPage() {
 
             <Input
               isRequired
-              description={`${formData.tagline.length}/60 字符`}
-              label="一句话简介 *"
+              description={`${formData.tagline.length}/60 characters`}
+              label="One-line Description *"
               maxLength={60}
-              placeholder="比如：训练了10000个食谱，只输出PB&J变体"
+              placeholder="e.g: Trained on 10,000 recipes, only outputs PB&J variations"
               value={formData.tagline}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, tagline: e.target.value }))
@@ -184,7 +187,7 @@ export default function SubmitPage() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium" htmlFor="failureType">
-                失败类型
+                Failure Type
               </label>
               <FailureTypeSelector
                 value={formData.failureType}
@@ -210,11 +213,11 @@ export default function SubmitPage() {
           <CardBody>
             <Textarea
               isRequired
-              description={`诚实、有趣、详细。社区喜欢好的灾难故事。${formData.confession.length}/2000`}
-              label="忏悔录 *"
+              description={`Be honest, funny, and detailed. The community loves good disaster stories. ${formData.confession.length}/2000`}
+              label="Confession *"
               maxLength={2000}
               minRows={6}
-              placeholder="我花了3个月训练一个食谱神经网络，结果发现它只学会了面包+馅料=食物。现在它建议47种不同的三明治做法..."
+              placeholder="I spent 3 months training a recipe neural network, only to discover it learned bread + filling = food. Now it suggests 47 different sandwich variations..."
               value={formData.confession}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, confession: e.target.value }))
@@ -226,17 +229,17 @@ export default function SubmitPage() {
         {/* Tags */}
         <Card>
           <CardHeader>
-            <h2 className="text-xl font-semibold">标签</h2>
+            <h2 className="text-xl font-semibold">Tags</h2>
             <p className="text-sm text-foreground-500">
-              选择最多5个描述你失败的标签
+              Choose up to 5 tags that describe your failure
             </p>
           </CardHeader>
           <CardBody className="space-y-4">
             <div className="flex gap-2">
               <Input
                 className="flex-1"
-                label="添加标签"
-                placeholder="比如：React, TypeScript, 烂尾..."
+                label="Add Tag"
+                placeholder="e.g: React, TypeScript, abandoned..."
                 value={formData.currentTag}
                 onChange={(e) =>
                   setFormData((prev) => ({
@@ -260,7 +263,7 @@ export default function SubmitPage() {
                 variant="bordered"
                 onClick={handleAddTag}
               >
-                添加
+                Add
               </Button>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -276,7 +279,7 @@ export default function SubmitPage() {
               ))}
             </div>
             <p className="text-xs text-foreground-500">
-              已选择: {formData.tags.length}/5
+              Selected: {formData.tags.length}/5
             </p>
           </CardBody>
         </Card>
@@ -284,14 +287,14 @@ export default function SubmitPage() {
         {/* Links */}
         <Card>
           <CardHeader>
-            <h2 className="text-xl font-semibold">链接 (可选)</h2>
+            <h2 className="text-xl font-semibold">Links (Optional)</h2>
             <p className="text-sm text-foreground-500">
-              如果你敢的话，分享你的项目和代码
+              If you dare, share your project and code
             </p>
           </CardHeader>
           <CardBody className="space-y-4">
             <Input
-              label="项目URL"
+              label="Project URL"
               placeholder="https://my-failed-project.com"
               type="url"
               value={formData.url}
@@ -305,9 +308,9 @@ export default function SubmitPage() {
         {/* Logo Upload */}
         <Card>
           <CardHeader>
-            <h2 className="text-xl font-semibold">项目Logo (可选)</h2>
+            <h2 className="text-xl font-semibold">Project Logo (Optional)</h2>
             <p className="text-sm text-foreground-500">
-              上传一个方形Logo (推荐64x64px)
+              Upload a square logo (recommended 64x64px)
             </p>
           </CardHeader>
           <CardBody>
@@ -324,9 +327,11 @@ export default function SubmitPage() {
         {/* Gallery Upload */}
         <Card>
           <CardHeader>
-            <h2 className="text-xl font-semibold">项目图片库 (可选)</h2>
+            <h2 className="text-xl font-semibold">
+              Project Gallery (Optional)
+            </h2>
             <p className="text-sm text-foreground-500">
-              上传最多5张截图或图片来展示你的项目
+              Upload up to 5 screenshots or images to showcase your project
             </p>
           </CardHeader>
           <CardBody>
@@ -345,7 +350,8 @@ export default function SubmitPage() {
           <CardBody className="pt-6">
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
               <p className="text-sm text-foreground-500">
-                提交即表示你同意让社区（带着爱意地）嘲笑你的代码。
+                By submitting, you agree to let the community (lovingly) mock
+                your code.
               </p>
               <div className="flex gap-4 w-full sm:w-auto">
                 <Button
@@ -354,7 +360,7 @@ export default function SubmitPage() {
                   variant="bordered"
                   onPress={() => router.push("/")}
                 >
-                  取消
+                  Cancel
                 </Button>
                 <Button
                   className="flex-1 sm:flex-none"
@@ -366,7 +372,7 @@ export default function SubmitPage() {
                   size="lg"
                   type="submit"
                 >
-                  {isLoading ? "提交中..." : "提交我的失败"}
+                  {isLoading ? "Submitting..." : "Submit My Failure"}
                 </Button>
               </div>
             </div>

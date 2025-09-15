@@ -42,7 +42,7 @@ export function ImageUpload({
 
     if (e.dataTransfer.files) {
       const files = Array.from(e.dataTransfer.files).filter((file) =>
-        file.type.startsWith("image/"),
+        file.type.startsWith("image/")
       );
 
       if (type === "logo") {
@@ -58,7 +58,7 @@ export function ImageUpload({
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files).filter((file) =>
-        file.type.startsWith("image/"),
+        file.type.startsWith("image/")
       );
 
       if (type === "logo") {
@@ -128,7 +128,7 @@ export function ImageUpload({
       {(type === "logo" ? images.length === 0 : images.length < maxImages) && (
         <Card
           isPressable
-          className={`border-2 border-dashed transition-colors cursor-pointer ${
+          className={`border-2 border-dashed transition-colors cursor-pointer w-full ${
             dragActive
               ? "border-primary bg-primary/5"
               : "border-default-300 hover:border-default-400"
@@ -143,8 +143,8 @@ export function ImageUpload({
             <Upload className="w-8 h-8 mb-4 text-foreground-400" />
             <p className="text-sm text-foreground-600 mb-2">
               {type === "logo"
-                ? "拖拽Logo到此处或点击上传"
-                : `拖拽图片到此处或点击上传 (${images.length}/${maxImages})`}
+                ? "Drag and drop a logo here, or click to select"
+                : `Drag and drop images here, or click to select (${images.length}/${maxImages})`}
             </p>
             <p className="text-xs text-foreground-500">
               支持 PNG, JPG, WebP 格式
@@ -163,7 +163,7 @@ export function ImageUpload({
               variant="bordered"
               onPress={() => document.getElementById(inputId)?.click()}
             >
-              选择{type === "logo" ? "Logo" : "图片"}
+              Choose {type === "logo" ? "Logo" : "Images"}
             </Button>
           </CardBody>
         </Card>
