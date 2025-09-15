@@ -30,14 +30,18 @@ export const handleApiError = (error: any, customMessage?: string) => {
 
   if (customMessage) {
     showErrorToast(customMessage);
+
     return;
   }
 
   // 根据错误类型显示不同的消息
-  if (error instanceof TypeError && error.message.includes('fetch')) {
+  if (error instanceof TypeError && error.message.includes("fetch")) {
     showErrorToast("网络错误", "请检查网络连接");
   } else if (error?.response?.status === 400) {
-    showErrorToast("请求错误", error?.response?.data?.message || "请检查输入信息");
+    showErrorToast(
+      "请求错误",
+      error?.response?.data?.message || "请检查输入信息",
+    );
   } else if (error?.response?.status === 401) {
     showErrorToast("未授权", "请重新登录");
   } else if (error?.response?.status === 403) {

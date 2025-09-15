@@ -5,6 +5,7 @@ import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
 import { Textarea } from "@heroui/input";
 import { Chip } from "@heroui/chip";
+
 import { handleApiError, showSuccessToast, showErrorToast } from "@/lib/toast";
 
 interface Comment {
@@ -54,6 +55,7 @@ export default function CommentItem({
     if (diffMinutes < 60) return `${diffMinutes}分钟前`;
     if (diffHours < 24) return `${diffHours}小时前`;
     if (diffDays < 7) return `${diffDays}天前`;
+
     return date.toLocaleDateString("zh-CN");
   };
 
@@ -64,6 +66,7 @@ export default function CommentItem({
 
     if (!replyContent.trim()) {
       showErrorToast("回复内容不能为空");
+
       return;
     }
 
@@ -89,7 +92,10 @@ export default function CommentItem({
         setShowReplyForm(false);
         showSuccessToast("回复发布成功！");
       } else {
-        handleApiError({ response: { status: 400, data } }, data.error || "发布回复失败");
+        handleApiError(
+          { response: { status: 400, data } },
+          data.error || "发布回复失败",
+        );
       }
     } catch (error) {
       handleApiError(error, "发布回复失败");
@@ -102,20 +108,20 @@ export default function CommentItem({
     <div className={isReply ? "ml-8 border-l-2 border-content3 pl-4" : ""}>
       <div className="flex gap-3">
         <Avatar
-          src={comment.author.avatarUrl}
+          className="w-8 h-8 flex-shrink-0"
           name={comment.author.username}
           size="sm"
-          className="w-8 h-8 flex-shrink-0"
+          src={comment.author.avatarUrl}
         />
         <div className="flex-1 space-y-2">
           <div className="flex items-center gap-2 text-sm">
             <span className="font-medium">{comment.author.username}</span>
             {comment.isAuthor && (
               <Chip
-                size="sm"
-                color="primary"
-                variant="flat"
                 className="text-xs"
+                color="primary"
+                size="sm"
+                variant="flat"
               >
                 创作者
               </Chip>
@@ -135,9 +141,9 @@ export default function CommentItem({
           <div className="flex items-center gap-2">
             {!isReply && currentUserId && (
               <Button
-                variant="light"
-                size="sm"
                 className="h-8 px-2"
+                size="sm"
+                variant="light"
                 onPress={() => setShowReplyForm(!showReplyForm)}
               >
                 回复
@@ -148,29 +154,29 @@ export default function CommentItem({
           {/* 回复表单 */}
           {showReplyForm && currentUserId && (
             <div className="space-y-2 mt-3">
-              <form onSubmit={handleSubmitReply} className="space-y-3">
+              <form className="space-y-3" onSubmit={handleSubmitReply}>
                 <Textarea
+                  className="min-h-[80px]"
+                  maxLength={1000}
+                  minRows={2}
                   placeholder={`回复 @${comment.author.username}...`}
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
-                  maxLength={1000}
-                  minRows={2}
-                  className="min-h-[80px]"
                 />
 
                 <div className="flex gap-2">
                   <Button
-                    type="submit"
-                    size="sm"
                     color="primary"
-                    isLoading={isSubmittingReply}
                     isDisabled={!replyContent.trim()}
+                    isLoading={isSubmittingReply}
+                    size="sm"
+                    type="submit"
                   >
                     {isSubmittingReply ? "发布中..." : "回复"}
                   </Button>
                   <Button
-                    variant="bordered"
                     size="sm"
+                    variant="bordered"
                     onPress={() => {
                       setShowReplyForm(false);
                       setReplyContent("");
@@ -192,11 +198,11 @@ export default function CommentItem({
             <CommentItem
               key={reply.id}
               comment={reply}
-              projectId={projectId}
-              projectAuthorId={projectAuthorId}
-              onReplyAdded={onReplyAdded}
               currentUserId={currentUserId}
               isReply={true}
+              projectAuthorId={projectAuthorId}
+              projectId={projectId}
+              onReplyAdded={onReplyAdded}
             />
           ))}
         </div>

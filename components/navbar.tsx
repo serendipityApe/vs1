@@ -12,9 +12,15 @@ import {
 import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 import { Avatar } from "@heroui/avatar";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@heroui/dropdown";
 import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
+import Image from "next/image";
 import clsx from "clsx";
 import { useSession, signIn, signOut } from "next-auth/react";
 
@@ -44,12 +50,22 @@ export const Navbar = () => {
   };
 
   return (
-    <HeroUINavbar maxWidth="xl" position="sticky" className="border-b border-divider bg-background/70 backdrop-blur-md">
+    <HeroUINavbar
+      className="border-b border-divider bg-background/70 backdrop-blur-md"
+      maxWidth="xl"
+      position="sticky"
+    >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-3" href="/">
-            <div className="w-8 h-8">
-              <img src="/logo.svg" alt="Vibe Shit Logo" className="w-full h-full" />
+            <div className="w-8 h-8 relative">
+              <Image
+                alt="Vibe Shit Logo"
+                className="w-full h-full"
+                height={32}
+                src="/logo.svg"
+                width={32}
+              />
             </div>
             <div className="hidden sm:block">
               <p className="font-bold text-inherit text-lg">Vibe Shit</p>
@@ -66,7 +82,7 @@ export const Navbar = () => {
                 className={clsx(
                   linkStyles({ color: "foreground" }),
                   "data-[active=true]:text-primary data-[active=true]:font-medium",
-                  "hover:text-primary transition-colors"
+                  "hover:text-primary transition-colors",
                 )}
                 color="foreground"
                 href={item.href}
@@ -78,18 +94,21 @@ export const Navbar = () => {
         </ul>
       </NavbarContent>
 
-      <NavbarContent className="hidden sm:flex basis-1/5 sm:basis-full" justify="end">
+      <NavbarContent
+        className="hidden sm:flex basis-1/5 sm:basis-full"
+        justify="end"
+      >
         <NavbarItem className="hidden sm:flex gap-2">
           <ThemeSwitch />
         </NavbarItem>
         <NavbarItem className="flex gap-3">
           {status === "loading" ? (
-            <Button variant="ghost" size="sm" isLoading>
+            <Button isLoading size="sm" variant="ghost">
               Loading
             </Button>
           ) : session ? (
             <>
-              <Button color="primary" size="sm" as={NextLink} href="/submit">
+              <Button as={NextLink} color="primary" href="/submit" size="sm">
                 Submit Shit
               </Button>
               <Dropdown placement="bottom-end">
@@ -97,9 +116,9 @@ export const Navbar = () => {
                   <Avatar
                     as="button"
                     className="transition-transform"
+                    name={session.user.username || session.user.name || "User"}
                     size="sm"
                     src={session.user.image || undefined}
-                    name={session.user.username || session.user.name || "User"}
                   />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="User menu" variant="flat">
@@ -114,7 +133,11 @@ export const Navbar = () => {
                   <DropdownItem key="settings" as={NextLink} href="/profile">
                     Profile
                   </DropdownItem>
-                  <DropdownItem key="my-projects" as={NextLink} href="/my-projects">
+                  <DropdownItem
+                    key="my-projects"
+                    as={NextLink}
+                    href="/my-projects"
+                  >
                     My Shit Projects
                   </DropdownItem>
                   <DropdownItem
@@ -129,7 +152,7 @@ export const Navbar = () => {
             </>
           ) : (
             <>
-              <Button variant="ghost" size="sm" onPress={handleSignIn}>
+              <Button size="sm" variant="ghost" onPress={handleSignIn}>
                 Login
               </Button>
               <Button color="primary" size="sm" onPress={handleSignIn}>
@@ -165,9 +188,11 @@ export const Navbar = () => {
                 <>
                   <div className="flex items-center gap-2 p-2">
                     <Avatar
+                      name={
+                        session.user.username || session.user.name || "User"
+                      }
                       size="sm"
                       src={session.user.image || undefined}
-                      name={session.user.username || session.user.name || "User"}
                     />
                     <div>
                       <p className="text-sm font-medium">
@@ -178,16 +203,21 @@ export const Navbar = () => {
                       </p>
                     </div>
                   </div>
-                  <Button color="primary" size="sm" as={NextLink} href="/submit">
+                  <Button
+                    as={NextLink}
+                    color="primary"
+                    href="/submit"
+                    size="sm"
+                  >
                     Submit Shit
                   </Button>
-                  <Button variant="ghost" size="sm" onPress={handleSignOut}>
+                  <Button size="sm" variant="ghost" onPress={handleSignOut}>
                     Logout
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button variant="ghost" size="sm" onPress={handleSignIn}>
+                  <Button size="sm" variant="ghost" onPress={handleSignIn}>
                     Login
                   </Button>
                   <Button color="primary" size="sm" onPress={handleSignIn}>

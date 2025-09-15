@@ -8,6 +8,8 @@ import { Chip } from "@heroui/chip";
 import { Link } from "@heroui/link";
 import { Avatar } from "@heroui/avatar";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+
 import CommentsSection from "@/components/comments/CommentsSection";
 import { ImageCarousel } from "@/components/ui/image-carousel";
 import { handleApiError, showSuccessToast } from "@/lib/toast";
@@ -36,21 +38,25 @@ interface Project {
 export default function ProjectDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
   const { data: session } = useSession();
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isVoting, setIsVoting] = useState(false);
+  const [projectId, setProjectId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchProject();
-  }, [params.id]);
+    params.then(({ id }) => {
+      setProjectId(id);
+      fetchProject(id);
+    });
+  }, [params]);
 
-  const fetchProject = async () => {
+  const fetchProject = async (id: string) => {
     try {
-      const response = await fetch(`/api/projects/${params.id}`);
+      const response = await fetch(`/api/projects/${id}`);
       const data = await response.json();
 
       if (response.ok) {
@@ -58,7 +64,7 @@ export default function ProjectDetailPage({
       } else {
         handleApiError(
           { response: { status: response.status, data } },
-          data.error || "加载项目失败"
+          data.error || "加载项目失败",
         );
         setProject(null);
       }
@@ -73,6 +79,7 @@ export default function ProjectDetailPage({
   const handleVote = async (action: "upvote" | "remove") => {
     if (!session) {
       router.push("/api/auth/signin");
+
       return;
     }
 
@@ -80,7 +87,7 @@ export default function ProjectDetailPage({
 
     setIsVoting(true);
     try {
-      const response = await fetch(`/api/projects/${project.id}/vote`, {
+      const response = await fetch(`/api/projects/${projectId}/vote`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -98,16 +105,16 @@ export default function ProjectDetailPage({
                 votesCount: data.votesCount,
                 hasVoted: data.hasVoted,
               }
-            : null
+            : null,
         );
         showSuccessToast(
           action === "upvote" ? "点赞成功！" : "取消点赞",
-          "感谢你的参与"
+          "感谢你的参与",
         );
       } else {
         handleApiError(
           { response: { status: 400, data } },
-          data.error || "投票失败"
+          data.error || "投票失败",
         );
       }
     } catch (error) {
@@ -117,7 +124,7 @@ export default function ProjectDetailPage({
     }
   };
 
-  if (isLoading) {
+  if (isLoading || !projectId) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">加载中...</div>
@@ -146,6 +153,7 @@ export default function ProjectDetailPage({
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
+
     return date.toLocaleDateString("zh-CN", {
       year: "numeric",
       month: "long",
@@ -162,8 +170,13 @@ export default function ProjectDetailPage({
       performance: "性能地狱",
       security: "安全漏洞",
     };
+
     return failureTypes[type] || type;
   };
+
+  if (!project) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -172,20 +185,20 @@ export default function ProjectDetailPage({
         <div className="container mx-auto px-4 py-4 max-w-4xl">
           <div className="flex items-center justify-between">
             <Button
-              variant="ghost"
               size="sm"
-              onPress={() => router.push("/")}
               startContent="←"
+              variant="ghost"
+              onPress={() => router.push("/")}
             >
               返回排行榜
             </Button>
             <div className="flex items-center gap-3">
-              <Button variant="bordered" size="sm" startContent="📤">
+              <Button size="sm" startContent="📤" variant="bordered">
                 分享
               </Button>
               <Button
-                size="sm"
                 color="primary"
+                size="sm"
                 onPress={() => router.push("/submit")}
               >
                 提交你的垃圾
@@ -200,19 +213,23 @@ export default function ProjectDetailPage({
         <section className="mb-8">
           <div className="flex items-start gap-6 mb-6">
             {/* 项目Logo */}
-            <div className="w-32 h-24 bg-content2 rounded-lg overflow-hidden flex-shrink-0">
+            <div className="w-32 h-24 bg-content2 rounded-lg overflow-hidden flex-shrink-0 relative">
               {project.logoUrl || project.imageUrl ? (
-                <img
-                  src={project.logoUrl || project.imageUrl}
+                <Image
+                  fill
                   alt={project.title}
                   className="w-full h-full object-cover"
+                  sizes="128px"
+                  src={(project.logoUrl || project.imageUrl) as string}
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center p-4">
-                  <img
-                    src="/logo.svg"
+                <div className="w-full h-full flex items-center justify-center p-4 relative">
+                  <Image
+                    fill
                     alt="Default Project Logo"
                     className="w-full h-full opacity-60"
+                    sizes="96px"
+                    src="/logo.svg"
                   />
                 </div>
               )}
@@ -230,7 +247,7 @@ export default function ProjectDetailPage({
               {/* 失败类型 */}
               {project.failureType && (
                 <div className="mb-4">
-                  <Chip variant="flat" color="warning" size="sm">
+                  <Chip color="warning" size="sm" variant="flat">
                     {getFailureTypeLabel(project.failureType)}
                   </Chip>
                 </div>
@@ -240,7 +257,7 @@ export default function ProjectDetailPage({
               {project.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {project.tags.map((tag) => (
-                    <Chip key={tag} variant="flat" size="sm" color="primary">
+                    <Chip key={tag} color="primary" size="sm" variant="flat">
                       {tag}
                     </Chip>
                   ))}
@@ -251,10 +268,10 @@ export default function ProjectDetailPage({
               <div className="flex items-center gap-4 text-sm text-foreground-500">
                 <div className="flex items-center gap-2">
                   <Avatar
-                    src={project.author.avatarUrl}
+                    className="w-6 h-6"
                     name={project.author.username}
                     size="sm"
-                    className="w-6 h-6"
+                    src={project.author.avatarUrl}
                   />
                   <span>by {project.author.username}</span>
                 </div>
@@ -268,16 +285,22 @@ export default function ProjectDetailPage({
             {/* 投票按钮 */}
             <div className="flex flex-col items-center gap-2">
               <Button
+                className="flex items-center gap-1 h-auto py-3 px-4 min-w-16"
                 color={project.hasVoted ? "primary" : "default"}
-                variant={project.hasVoted ? "solid" : "bordered"}
+                isLoading={isVoting}
                 size="lg"
+                startContent={
+                  <Image
+                    alt="Vote"
+                    className="w-5 h-5"
+                    height={20}
+                    src="/logo.svg"
+                    width={20}
+                  />
+                }
+                variant={project.hasVoted ? "solid" : "bordered"}
                 onPress={() =>
                   handleVote(project.hasVoted ? "remove" : "upvote")
-                }
-                isLoading={isVoting}
-                className="flex items-center gap-1 h-auto py-3 px-4 min-w-16"
-                startContent={
-                  <img src="/logo.svg" alt="Vote" className="w-5 h-5" />
                 }
               >
                 <span className="font-bold">Upvote</span>
@@ -289,26 +312,26 @@ export default function ProjectDetailPage({
           {/* 项目链接 */}
           <div className="flex gap-3">
             {project.url && (
-              <Button variant="bordered" asChild>
-                <Link
-                  href={project.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span className="mr-2">🔗</span>
-                  查看项目
-                </Link>
+              <Button
+                as={Link}
+                href={project.url}
+                rel="noopener noreferrer"
+                target="_blank"
+                variant="bordered"
+              >
+                <span className="mr-2">🔗</span>
+                查看项目
               </Button>
             )}
-            <Button variant="bordered" asChild>
-              <Link
-                href={`https://github.com/${project.author.username}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span className="mr-2">🐛</span>
-                查看作者
-              </Link>
+            <Button
+              as={Link}
+              href={`https://github.com/${project.author.username}`}
+              rel="noopener noreferrer"
+              target="_blank"
+              variant="bordered"
+            >
+              <span className="mr-2">🐛</span>
+              查看作者
             </Button>
           </div>
         </section>
@@ -327,7 +350,13 @@ export default function ProjectDetailPage({
             <CardHeader>
               <div className="flex flex-col gap-2">
                 <div className="flex items-center align-center gap-1">
-                  <img src="/prize.svg" alt="" className="w-5 h-5" />
+                  <Image
+                    alt=""
+                    className="w-5 h-5"
+                    height={20}
+                    src="/prize.svg"
+                    width={20}
+                  />
                   <h2 className="text-xl font-bold">辉煌忏悔录</h2>
                 </div>
                 <p className="text-sm text-foreground-500">
@@ -353,8 +382,8 @@ export default function ProjectDetailPage({
         {/* 评论区 */}
         <section>
           <CommentsSection
-            projectId={project.id}
             projectAuthorId={project.author.id}
+            projectId={projectId}
           />
         </section>
       </main>

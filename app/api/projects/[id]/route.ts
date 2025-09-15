@@ -1,15 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    const projectId = params.id
+    const session = await getServerSession(authOptions);
+    const { id: projectId } = await params;
 
     // 获取项目详情
     const project = await prisma.project.findUnique({
@@ -29,17 +30,15 @@ export async function GET(
           },
         },
       },
-    })
+    });
 
     if (!project) {
-      return NextResponse.json(
-        { error: '项目不存在' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "项目不存在" }, { status: 404 });
     }
 
     // 检查当前用户是否已投票
-    let hasVoted = false
+    let hasVoted = false;
+
     if (session?.user?.id) {
       const vote = await prisma.vote.findUnique({
         where: {
@@ -48,8 +47,9 @@ export async function GET(
             projectId: projectId,
           },
         },
-      })
-      hasVoted = !!vote
+      });
+
+      hasVoted = !!vote;
     }
 
     // 格式化响应数据
@@ -68,16 +68,14 @@ export async function GET(
       votesCount: project._count.votes,
       hasVoted,
       author: project.author,
-    }
+    };
 
     return NextResponse.json({
       project: formattedProject,
-    })
+    });
   } catch (error) {
-    console.error('获取项目详情失败:', error)
-    return NextResponse.json(
-      { error: '服务器错误' },
-      { status: 500 }
-    )
+    console.error("获取项目详情失败:", error);
+
+    return NextResponse.json({ error: "服务器错误" }, { status: 500 });
   }
 }

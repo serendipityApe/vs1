@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@heroui/button";
-import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Card, CardBody } from "@heroui/card";
 import { Chip } from "@heroui/chip";
 import { Avatar } from "@heroui/avatar";
 import { Link } from "@heroui/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+
 import { handleApiError } from "@/lib/toast";
 
 interface Project {
@@ -41,12 +43,13 @@ export default function Home() {
     try {
       const response = await fetch("/api/projects?limit=10&sort=votes");
       const data = await response.json();
+
       if (response.ok) {
         setProjects(data.projects);
       } else {
         handleApiError(
           { response: { status: response.status, data } },
-          "获取项目列表失败"
+          "获取项目列表失败",
         );
       }
     } catch (error) {
@@ -65,6 +68,7 @@ export default function Home() {
     if (diffDays === 0) return "今天";
     if (diffDays === 1) return "昨天";
     if (diffDays < 7) return `${diffDays}天前`;
+
     return date.toLocaleDateString("zh-CN");
   };
 
@@ -123,32 +127,38 @@ export default function Home() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-12">
           <Button
-            color="primary"
-            size="lg"
             className="font-semibold"
-            onPress={() => router.push("/submit")}
+            color="primary"
             endContent={
-              <img src="/logo.svg" alt="Vote" className="w-5 h-5 color-white" />
+              <Image
+                alt="Vote"
+                className="w-5 h-5 color-white"
+                height={20}
+                src="/logo.svg"
+                width={20}
+              />
             }
+            size="lg"
+            onPress={() => router.push("/submit")}
           >
             Submit Your Shit
           </Button>
           <Button
-            variant="bordered"
             size="lg"
+            variant="bordered"
             onPress={() => {
               document
                 .getElementById("leaderboard")
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
           >
-            Browse Today's Shit
+            Browse Today&apos;s Shit
           </Button>
         </div>
       </div>
 
       {/* Features */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
+      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
         <Card className="p-2">
           <CardBody className="text-center">
             <div className="text-3xl mb-4">🤡</div>
@@ -181,10 +191,10 @@ export default function Home() {
             </p>
           </CardBody>
         </Card>
-      </div>
+      </div> */}
 
       {/* Today's Top Shit */}
-      <div id="leaderboard" className="w-full max-w-6xl mx-auto">
+      <div className="w-full max-w-6xl mx-auto" id="leaderboard">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold mb-2">Shit Leaderboard</h2>
           <p className="text-foreground-600">
@@ -229,12 +239,20 @@ export default function Home() {
                     </div>
 
                     {/* 项目图片 */}
-                    {(project.logoUrl || project.imageUrl || project.galleryUrls.length > 0) && (
-                      <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                        <img
-                          src={project.logoUrl || project.imageUrl || project.galleryUrls[0]}
+                    {(project.logoUrl ||
+                      project.imageUrl ||
+                      project.galleryUrls.length > 0) && (
+                      <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 relative">
+                        <Image
                           alt={project.title}
                           className="w-full h-full object-cover"
+                          height={64}
+                          src={
+                            project.logoUrl ||
+                            project.imageUrl ||
+                            project.galleryUrls[0]
+                          }
+                          width={64}
                         />
                       </div>
                     )}
@@ -245,8 +263,8 @@ export default function Home() {
                         <div className="flex-1">
                           <h3 className="text-xl font-bold mb-1 text-foreground-900">
                             <Link
-                              href={`/projects/${project.id}`}
                               className="hover:text-primary transition-colors"
+                              href={`/projects/${project.id}`}
                             >
                               {project.title}
                             </Link>
@@ -284,14 +302,14 @@ export default function Home() {
                             <Chip
                               key={tag}
                               color="warning"
-                              variant="light"
                               size="sm"
+                              variant="light"
                             >
                               {tag}
                             </Chip>
                           ))}
                           {project.tags.length > 3 && (
-                            <Chip color="warning" variant="light" size="sm">
+                            <Chip color="warning" size="sm" variant="light">
                               +{project.tags.length - 3}
                             </Chip>
                           )}
@@ -301,10 +319,10 @@ export default function Home() {
                       {/* 作者和时间 */}
                       <div className="flex items-center gap-2 text-sm text-foreground-500">
                         <Avatar
-                          src={project.author.avatarUrl}
+                          className="w-5 h-5"
                           name={project.author.username}
                           size="sm"
-                          className="w-5 h-5"
+                          src={project.author.avatarUrl}
                         />
                         <span>{project.author.username}</span>
                         <span>•</span>
@@ -319,8 +337,8 @@ export default function Home() {
             {/* 查看更多 */}
             <div className="text-center pt-6">
               <Button
-                variant="bordered"
                 size="lg"
+                variant="bordered"
                 onPress={() => router.push("/projects")}
               >
                 View More Shit Projects

@@ -6,7 +6,9 @@ import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Textarea } from "@heroui/input";
 import { Link } from "@heroui/link";
+
 import CommentItem from "./CommentItem";
+
 import { handleApiError, showSuccessToast, showErrorToast } from "@/lib/toast";
 
 interface Comment {
@@ -28,7 +30,10 @@ interface CommentsSectionProps {
   projectAuthorId: string;
 }
 
-export default function CommentsSection({ projectId, projectAuthorId }: CommentsSectionProps) {
+export default function CommentsSection({
+  projectId,
+  projectAuthorId,
+}: CommentsSectionProps) {
   const { data: session } = useSession();
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,10 +52,13 @@ export default function CommentsSection({ projectId, projectAuthorId }: Comments
       if (response.ok) {
         setComments(data.comments);
       } else {
-        handleApiError({ response: { status: response.status, data } }, data.error || '加载评论失败');
+        handleApiError(
+          { response: { status: response.status, data } },
+          data.error || "加载评论失败",
+        );
       }
     } catch (error) {
-      handleApiError(error, '获取评论失败');
+      handleApiError(error, "获取评论失败");
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +72,8 @@ export default function CommentsSection({ projectId, projectAuthorId }: Comments
     }
 
     if (!newComment.trim()) {
-      showErrorToast('评论内容不能为空');
+      showErrorToast("评论内容不能为空");
+
       return;
     }
 
@@ -72,9 +81,9 @@ export default function CommentsSection({ projectId, projectAuthorId }: Comments
 
     try {
       const response = await fetch(`/api/projects/${projectId}/comments`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           content: newComment.trim(),
@@ -86,33 +95,38 @@ export default function CommentsSection({ projectId, projectAuthorId }: Comments
       if (data.success) {
         // 添加新评论到列表
         const newCommentData = data.comment;
-        setComments(prev => {
+
+        setComments((prev) => {
           // 如果是置顶评论，插入到最前面
           if (newCommentData.isPinned) {
             return [newCommentData, ...prev];
           }
+
           // 否则按时间顺序插入
           return [...prev, newCommentData];
         });
         setNewComment("");
         showSuccessToast("评论发布成功！", "感谢你的参与讨论");
       } else {
-        handleApiError({ response: { status: 400, data } }, data.error || '发布评论失败');
+        handleApiError(
+          { response: { status: 400, data } },
+          data.error || "发布评论失败",
+        );
       }
     } catch (error) {
-      handleApiError(error, '发布评论失败');
+      handleApiError(error, "发布评论失败");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleReplyAdded = (parentId: string, reply: Comment) => {
-    setComments(prev =>
-      prev.map(comment =>
+    setComments((prev) =>
+      prev.map((comment) =>
         comment.id === parentId
           ? { ...comment, replies: [...comment.replies, reply] }
-          : comment
-      )
+          : comment,
+      ),
     );
   };
 
@@ -140,22 +154,22 @@ export default function CommentsSection({ projectId, projectAuthorId }: Comments
       <CardBody className="space-y-6">
         {/* 发布评论表单 */}
         {session ? (
-          <form onSubmit={handleSubmitComment} className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmitComment}>
             <Textarea
+              description={`${newComment.length}/1000 字符`}
+              maxLength={1000}
+              minRows={4}
               placeholder="分享你的想法、类似经历，或者单纯地欣赏这个混乱..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              maxLength={1000}
-              minRows={4}
-              description={`${newComment.length}/1000 字符`}
             />
 
             <div className="flex justify-end">
               <Button
-                type="submit"
                 color="primary"
-                isLoading={isSubmitting}
                 isDisabled={!newComment.trim()}
+                isLoading={isSubmitting}
+                type="submit"
               >
                 {isSubmitting ? "发布中..." : "发布评论"}
               </Button>
@@ -163,13 +177,11 @@ export default function CommentsSection({ projectId, projectAuthorId }: Comments
           </form>
         ) : (
           <div className="text-center p-6 bg-content2 rounded-lg">
-            <p className="text-foreground-600 mb-4">
-              请登录后参与讨论
-            </p>
+            <p className="text-foreground-600 mb-4">请登录后参与讨论</p>
             <Button
               as={Link}
-              href="/api/auth/signin"
               color="primary"
+              href="/api/auth/signin"
               variant="bordered"
             >
               GitHub 登录
@@ -186,45 +198,47 @@ export default function CommentsSection({ projectId, projectAuthorId }: Comments
         ) : (
           <div className="space-y-6 border-t pt-6">
             {/* 置顶评论 */}
-            {comments.filter(comment => comment.isPinned).length > 0 && (
+            {comments.filter((comment) => comment.isPinned).length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-foreground-500">
                   <span>📌</span>
                   创作者置顶
                 </div>
                 {comments
-                  .filter(comment => comment.isPinned)
+                  .filter((comment) => comment.isPinned)
                   .map((comment) => (
                     <CommentItem
                       key={comment.id}
                       comment={comment}
-                      projectId={projectId}
-                      projectAuthorId={projectAuthorId}
-                      onReplyAdded={handleReplyAdded}
                       currentUserId={session?.user?.id}
+                      projectAuthorId={projectAuthorId}
+                      projectId={projectId}
+                      onReplyAdded={handleReplyAdded}
                     />
                   ))}
               </div>
             )}
 
             {/* 普通评论 */}
-            {comments.filter(comment => !comment.isPinned).length > 0 && (
+            {comments.filter((comment) => !comment.isPinned).length > 0 && (
               <div className="space-y-4">
-                {comments.filter(comment => comment.isPinned).length > 0 && (
+                {comments.filter((comment) => comment.isPinned).length > 0 && (
                   <div className="border-t pt-6">
-                    <div className="text-sm font-medium text-foreground-500 mb-4">所有评论</div>
+                    <div className="text-sm font-medium text-foreground-500 mb-4">
+                      所有评论
+                    </div>
                   </div>
                 )}
                 {comments
-                  .filter(comment => !comment.isPinned)
+                  .filter((comment) => !comment.isPinned)
                   .map((comment) => (
                     <CommentItem
                       key={comment.id}
                       comment={comment}
-                      projectId={projectId}
-                      projectAuthorId={projectAuthorId}
-                      onReplyAdded={handleReplyAdded}
                       currentUserId={session?.user?.id}
+                      projectAuthorId={projectAuthorId}
+                      projectId={projectId}
+                      onReplyAdded={handleReplyAdded}
                     />
                   ))}
               </div>

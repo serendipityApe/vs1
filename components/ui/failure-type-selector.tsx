@@ -46,18 +46,21 @@ interface FailureTypeSelectorProps {
   onChange: (value: string) => void;
 }
 
-export function FailureTypeSelector({ value, onChange }: FailureTypeSelectorProps) {
+export function FailureTypeSelector({
+  value,
+  onChange,
+}: FailureTypeSelectorProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       {failureTypes.map((type) => (
         <Card
           key={type.id}
+          isPressable
           className={`cursor-pointer transition-colors ${
             value === type.id
               ? "ring-2 ring-primary bg-primary/5 border-primary"
               : "hover:bg-content2/50"
           }`}
-          isPressable
           onPress={() => onChange(type.id)}
         >
           <CardBody className="p-4">
@@ -65,7 +68,9 @@ export function FailureTypeSelector({ value, onChange }: FailureTypeSelectorProp
               <span className="text-2xl">{type.emoji}</span>
               <div className="flex-1">
                 <h4 className="font-medium text-sm">{type.label}</h4>
-                <p className="text-xs text-foreground-500 mt-1">{type.description}</p>
+                <p className="text-xs text-foreground-500 mt-1">
+                  {type.description}
+                </p>
               </div>
             </div>
           </CardBody>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -11,7 +12,11 @@ interface ImageCarouselProps {
   className?: string;
 }
 
-export function ImageCarousel({ images, title, className }: ImageCarouselProps) {
+export function ImageCarousel({
+  images,
+  title,
+  className,
+}: ImageCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   if (!images || images.length === 0) {
@@ -35,10 +40,12 @@ export function ImageCarousel({ images, title, className }: ImageCarouselProps) 
       <CardBody className="p-0">
         {/* Main Image */}
         <div className="relative aspect-video bg-content2 overflow-hidden rounded-t-lg">
-          <img
-            src={images[currentIndex]}
+          <Image
+            fill
             alt={`${title} - Image ${currentIndex + 1}`}
             className="w-full h-full object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            src={images[currentIndex]}
           />
 
           {/* Navigation Buttons */}
@@ -46,16 +53,16 @@ export function ImageCarousel({ images, title, className }: ImageCarouselProps) 
             <>
               <Button
                 isIconOnly
-                variant="flat"
                 className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/30 text-white hover:bg-black/50"
+                variant="flat"
                 onPress={prevImage}
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
               <Button
                 isIconOnly
-                variant="flat"
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/30 text-white hover:bg-black/50"
+                variant="flat"
                 onPress={nextImage}
               >
                 <ChevronRight className="w-4 h-4" />
@@ -78,15 +85,19 @@ export function ImageCarousel({ images, title, className }: ImageCarouselProps) 
               {images.map((image, index) => (
                 <button
                   key={index}
-                  onClick={() => goToImage(index)}
-                  className={`flex-shrink-0 w-16 h-12 bg-content3 rounded overflow-hidden transition-opacity ${
-                    index === currentIndex ? "ring-2 ring-primary opacity-100" : "opacity-60 hover:opacity-80"
+                  className={`flex-shrink-0 w-16 h-12 bg-content3 rounded overflow-hidden transition-opacity relative ${
+                    index === currentIndex
+                      ? "ring-2 ring-primary opacity-100"
+                      : "opacity-60 hover:opacity-80"
                   }`}
+                  onClick={() => goToImage(index)}
                 >
-                  <img
-                    src={image}
+                  <Image
+                    fill
                     alt={`Thumbnail ${index + 1}`}
                     className="w-full h-full object-cover"
+                    sizes="64px"
+                    src={image}
                   />
                 </button>
               ))}

@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import GitHubProvider from "next-auth/providers/github";
+
 import { prisma } from "./prisma";
 
 declare module "next-auth" {
@@ -62,6 +63,7 @@ export const authOptions: NextAuthOptions = {
         token.githubId = githubId;
         token.username = username;
       }
+
       return token;
     },
     async session({ session, token }) {
@@ -71,12 +73,13 @@ export const authOptions: NextAuthOptions = {
         session.user.githubId = token.githubId;
         session.user.username = token.username;
       }
+
       return session;
     },
   },
   pages: {
-    signIn: '/auth/signin',
-    error: '/auth/error',
+    signIn: "/auth/signin",
+    error: "/auth/error",
   },
   session: {
     strategy: "jwt",

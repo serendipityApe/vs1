@@ -9,6 +9,7 @@ import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Chip } from "@heroui/chip";
 import { Link } from "@heroui/link";
 import { Lightbulb, AlertTriangle } from "lucide-react";
+
 import { ImageUpload } from "@/components/ui/image-upload";
 import { FailureTypeSelector } from "@/components/ui/failure-type-selector";
 import { handleApiError, showSuccessToast } from "@/lib/toast";
@@ -49,7 +50,7 @@ export default function SubmitPage() {
             <p className="text-foreground-600 mb-6">
               请先登录才能提交你的垃圾项目
             </p>
-            <Button as={Link} href="/api/auth/signin" color="primary" size="lg">
+            <Button as={Link} color="primary" href="/api/auth/signin" size="lg">
               GitHub 登录
             </Button>
           </CardBody>
@@ -82,13 +83,16 @@ export default function SubmitPage() {
     try {
       // 上传Logo
       let logoUrl = null;
+
       if (formData.logoFiles.length > 0) {
         const logoUrls = await uploadFiles(formData.logoFiles);
+
         logoUrl = logoUrls[0];
       }
 
       // 上传图片库
       let galleryUrls: string[] = [];
+
       if (formData.galleryFiles.length > 0) {
         galleryUrls = await uploadFiles(formData.galleryFiles);
       }
@@ -118,7 +122,7 @@ export default function SubmitPage() {
       } else {
         handleApiError(
           { response: { status: 400, data: { message: data.errors?.[0] } } },
-          data.errors?.[0] || "提交失败"
+          data.errors?.[0] || "提交失败",
         );
       }
     } catch (error) {
@@ -141,7 +145,7 @@ export default function SubmitPage() {
         </p>
       </section>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form className="space-y-6" onSubmit={handleSubmit}>
         {/* Basic Info */}
         <Card>
           <CardHeader>
@@ -149,35 +153,39 @@ export default function SubmitPage() {
               <Lightbulb className="w-5 h-5 text-primary" />
               <h2 className="text-xl font-semibold">Project Details</h2>
             </div>
-            <p className="text-sm text-foreground-500">Tell us about your magnificent disaster</p>
+            <p className="text-sm text-foreground-500">
+              Tell us about your magnificent disaster
+            </p>
           </CardHeader>
           <CardBody className="space-y-4">
             <Input
+              isRequired
+              description={`${formData.title.length}/100 字符`}
               label="项目名称 *"
+              maxLength={100}
               placeholder="比如：AI食谱生成器只会做三明治"
               value={formData.title}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, title: e.target.value }))
               }
-              isRequired
-              maxLength={100}
-              description={`${formData.title.length}/100 字符`}
             />
 
             <Input
+              isRequired
+              description={`${formData.tagline.length}/60 字符`}
               label="一句话简介 *"
+              maxLength={60}
               placeholder="比如：训练了10000个食谱，只输出PB&J变体"
               value={formData.tagline}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, tagline: e.target.value }))
               }
-              isRequired
-              maxLength={60}
-              description={`${formData.tagline.length}/60 字符`}
             />
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">失败类型</label>
+              <label className="text-sm font-medium" htmlFor="failureType">
+                失败类型
+              </label>
               <FailureTypeSelector
                 value={formData.failureType}
                 onChange={(value) =>
@@ -195,20 +203,22 @@ export default function SubmitPage() {
               <AlertTriangle className="w-5 h-5 text-primary" />
               <h2 className="text-xl font-semibold">The Confession</h2>
             </div>
-            <p className="text-sm text-foreground-500">Tell us the full story - what went wrong and why?</p>
+            <p className="text-sm text-foreground-500">
+              Tell us the full story - what went wrong and why?
+            </p>
           </CardHeader>
           <CardBody>
             <Textarea
+              isRequired
+              description={`诚实、有趣、详细。社区喜欢好的灾难故事。${formData.confession.length}/2000`}
               label="忏悔录 *"
+              maxLength={2000}
+              minRows={6}
               placeholder="我花了3个月训练一个食谱神经网络，结果发现它只学会了面包+馅料=食物。现在它建议47种不同的三明治做法..."
               value={formData.confession}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, confession: e.target.value }))
               }
-              isRequired
-              maxLength={2000}
-              minRows={6}
-              description={`诚实、有趣、详细。社区喜欢好的灾难故事。${formData.confession.length}/2000`}
             />
           </CardBody>
         </Card>
@@ -217,11 +227,14 @@ export default function SubmitPage() {
         <Card>
           <CardHeader>
             <h2 className="text-xl font-semibold">标签</h2>
-            <p className="text-sm text-foreground-500">选择最多5个描述你失败的标签</p>
+            <p className="text-sm text-foreground-500">
+              选择最多5个描述你失败的标签
+            </p>
           </CardHeader>
           <CardBody className="space-y-4">
             <div className="flex gap-2">
               <Input
+                className="flex-1"
                 label="添加标签"
                 placeholder="比如：React, TypeScript, 烂尾..."
                 value={formData.currentTag}
@@ -237,16 +250,15 @@ export default function SubmitPage() {
                     handleAddTag();
                   }
                 }}
-                className="flex-1"
               />
               <Button
-                type="button"
-                variant="bordered"
-                onClick={handleAddTag}
+                className="mt-2"
                 isDisabled={
                   !formData.currentTag.trim() || formData.tags.length >= 5
                 }
-                className="mt-2"
+                type="button"
+                variant="bordered"
+                onClick={handleAddTag}
               >
                 添加
               </Button>
@@ -255,15 +267,17 @@ export default function SubmitPage() {
               {formData.tags.map((tag) => (
                 <Chip
                   key={tag}
-                  onClose={() => handleRemoveTag(tag)}
-                  variant="flat"
                   color="primary"
+                  variant="flat"
+                  onClose={() => handleRemoveTag(tag)}
                 >
                   {tag}
                 </Chip>
               ))}
             </div>
-            <p className="text-xs text-foreground-500">已选择: {formData.tags.length}/5</p>
+            <p className="text-xs text-foreground-500">
+              已选择: {formData.tags.length}/5
+            </p>
           </CardBody>
         </Card>
 
@@ -271,7 +285,9 @@ export default function SubmitPage() {
         <Card>
           <CardHeader>
             <h2 className="text-xl font-semibold">链接 (可选)</h2>
-            <p className="text-sm text-foreground-500">如果你敢的话，分享你的项目和代码</p>
+            <p className="text-sm text-foreground-500">
+              如果你敢的话，分享你的项目和代码
+            </p>
           </CardHeader>
           <CardBody className="space-y-4">
             <Input
@@ -290,12 +306,14 @@ export default function SubmitPage() {
         <Card>
           <CardHeader>
             <h2 className="text-xl font-semibold">项目Logo (可选)</h2>
-            <p className="text-sm text-foreground-500">上传一个方形Logo (推荐64x64px)</p>
+            <p className="text-sm text-foreground-500">
+              上传一个方形Logo (推荐64x64px)
+            </p>
           </CardHeader>
           <CardBody>
             <ImageUpload
-              type="logo"
               images={formData.logoFiles}
+              type="logo"
               onImagesChange={(files) =>
                 setFormData((prev) => ({ ...prev, logoFiles: files }))
               }
@@ -307,12 +325,14 @@ export default function SubmitPage() {
         <Card>
           <CardHeader>
             <h2 className="text-xl font-semibold">项目图片库 (可选)</h2>
-            <p className="text-sm text-foreground-500">上传最多5张截图或图片来展示你的项目</p>
+            <p className="text-sm text-foreground-500">
+              上传最多5张截图或图片来展示你的项目
+            </p>
           </CardHeader>
           <CardBody>
             <ImageUpload
-              type="gallery"
               images={formData.galleryFiles}
+              type="gallery"
               onImagesChange={(files) =>
                 setFormData((prev) => ({ ...prev, galleryFiles: files }))
               }
@@ -329,20 +349,22 @@ export default function SubmitPage() {
               </p>
               <div className="flex gap-4 w-full sm:w-auto">
                 <Button
-                  variant="bordered"
-                  size="lg"
-                  onPress={() => router.push("/")}
                   className="flex-1 sm:flex-none"
+                  size="lg"
+                  variant="bordered"
+                  onPress={() => router.push("/")}
                 >
                   取消
                 </Button>
                 <Button
+                  className="flex-1 sm:flex-none"
                   color="primary"
-                  type="submit"
+                  isDisabled={
+                    !formData.title || !formData.tagline || !formData.confession
+                  }
                   isLoading={isLoading}
                   size="lg"
-                  className="flex-1 sm:flex-none"
-                  isDisabled={!formData.title || !formData.tagline || !formData.confession}
+                  type="submit"
                 >
                   {isLoading ? "提交中..." : "提交我的失败"}
                 </Button>

@@ -13,7 +13,8 @@ export const metadata: Metadata = {
     default: "Vibe Shit - 辉煌的失败展示台",
     template: `%s - Vibe Shit`,
   },
-  description: "一个专门展示辉煌失败编程项目的平台。在这里，bug不是缺陷，而是特色。",
+  description:
+    "一个专门展示辉煌失败编程项目的平台。在这里，bug不是缺陷，而是特色。",
   icons: {
     icon: "/favicon.ico",
   },
