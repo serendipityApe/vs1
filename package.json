@@ -9,7 +9,6 @@
     "lint": "eslint --fix"
   },
   "dependencies": {
-    "@auth/core": "^0.40.0",
     "@heroui/accordion": "2.2.23",
     "@heroui/alert": "2.2.26",
     "@heroui/autocomplete": "2.3.28",
