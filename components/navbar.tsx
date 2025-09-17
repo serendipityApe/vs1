@@ -22,8 +22,8 @@ import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
 import Image from "next/image";
 import clsx from "clsx";
-import { useSession, signIn, signOut } from "next-auth/react";
 
+import { useSupabase } from "@/app/supabase-provider";
 import { ThemeSwitch } from "@/components/theme-switch";
 
 const navItems = [
@@ -39,15 +39,28 @@ const navMenuItems = [
 ];
 
 export const Navbar = () => {
-  const { data: session, status } = useSession();
+  const { supabase, user, session } = useSupabase();
 
-  const handleSignIn = () => {
-    signIn("github");
+  const status: "loading" | "authenticated" | "unauthenticated" =
+    session === undefined
+      ? "loading"
+      : session
+        ? "authenticated"
+        : "unauthenticated";
+
+  const handleSignIn = async () => {
+    await supabase?.auth.signInWithOAuth({ provider: "github" });
   };
 
-  const handleSignOut = () => {
-    signOut();
+  const handleSignOut = async () => {
+    await supabase?.auth.signOut();
   };
+
+  const displayName = (user?.user_metadata as any)?.username || user?.email;
+  const avatarSrc =
+    (user?.user_metadata as any)?.avatar_url ||
+    (user?.user_metadata as any)?.avatarUrl ||
+    undefined;
 
   return (
     <HeroUINavbar
@@ -116,19 +129,15 @@ export const Navbar = () => {
                   <Avatar
                     as="button"
                     className="transition-transform"
-                    name={session.user.username || session.user.name || "User"}
+                    name={displayName || "User"}
                     size="sm"
-                    src={session.user.image || undefined}
+                    src={avatarSrc}
                   />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="User menu" variant="flat">
                   <DropdownItem key="profile" className="h-14 gap-2">
-                    <p className="font-semibold">
-                      {session.user.username || session.user.name}
-                    </p>
-                    <p className="text-sm text-foreground-500">
-                      {session.user.email}
-                    </p>
+                    <p className="font-semibold">{displayName}</p>
+                    <p className="text-sm text-foreground-500">{user?.email}</p>
                   </DropdownItem>
                   <DropdownItem key="settings" as={NextLink} href="/profile">
                     Profile
@@ -188,18 +197,14 @@ export const Navbar = () => {
                 <>
                   <div className="flex items-center gap-2 p-2">
                     <Avatar
-                      name={
-                        session.user.username || session.user.name || "User"
-                      }
+                      name={displayName || "User"}
                       size="sm"
-                      src={session.user.image || undefined}
+                      src={avatarSrc}
                     />
                     <div>
-                      <p className="text-sm font-medium">
-                        {session.user.username || session.user.name}
-                      </p>
+                      <p className="text-sm font-medium">{displayName}</p>
                       <p className="text-xs text-foreground-500">
-                        {session.user.email}
+                        {user?.email}
                       </p>
                     </div>
                   </div>

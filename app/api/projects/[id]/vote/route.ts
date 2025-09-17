@@ -1,27 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import {
+  getUserFromRequest,
+  supabase,
+  setSessionCookies,
+} from "@/lib/supabase";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const { user, session } = await getUserFromRequest(req as Request);
 
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { success: false, error: "未登录" },
-        { status: 401 },
-      );
+    const makeResponse = (body: any, opts?: any) => {
+      const res = NextResponse.json(body, opts);
+
+      if (session?.isRefreshed) {
+        try {
+          setSessionCookies(res, session);
+        } catch {
+          // ignore
+        }
+      }
+
+      return res;
+    };
+
+    if (!user?.id) {
+      return makeResponse({ success: false, error: "未登录" }, { status: 401 });
     }
 
     const body = await req.json();
     const { action } = body;
     const { id: projectId } = await params;
-    const userId = session.user.id;
+    const userId = user.id;
 
     if (!["upvote", "remove"].includes(action)) {
       return NextResponse.json(
@@ -30,10 +43,24 @@ export async function POST(
       );
     }
 
-    // 检查项目是否存在
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
-    });
+    // 检查项目是否存在并获取作者
+    const { data: projectData, error: projectError } = await supabase
+      .from("projects")
+      .select("id,author_id")
+      .eq("id", projectId)
+      .limit(1);
+
+    if (projectError) {
+      // eslint-disable-next-line no-console
+      console.error("supabase project fetch error:", projectError);
+
+      return NextResponse.json(
+        { success: false, error: "服务器错误" },
+        { status: 500 },
+      );
+    }
+
+    const project = projectData?.[0] ?? null;
 
     if (!project) {
       return NextResponse.json(
@@ -43,7 +70,7 @@ export async function POST(
     }
 
     // 检查用户不能给自己的项目投票
-    if (project.authorId === userId) {
+    if (project.author_id === userId) {
       return NextResponse.json(
         { success: false, error: "不能给自己的项目投票" },
         { status: 400 },
@@ -51,14 +78,17 @@ export async function POST(
     }
 
     // 检查当前投票状态
-    const existingVote = await prisma.vote.findUnique({
-      where: {
-        userId_projectId: {
-          userId,
-          projectId,
-        },
-      },
-    });
+    const { data: existingVoteData, error: existingVoteError } = await supabase
+      .from("votes")
+      .select("id")
+      .match({ user_id: userId, project_id: projectId });
+
+    if (existingVoteError) {
+      void existingVoteError;
+    }
+
+    const existingVote =
+      Array.isArray(existingVoteData) && existingVoteData.length > 0;
 
     if (action === "upvote") {
       if (existingVote) {
@@ -69,12 +99,19 @@ export async function POST(
       }
 
       // 创建投票
-      await prisma.vote.create({
-        data: {
-          userId,
-          projectId,
-        },
-      });
+      const { error: createError } = await supabase
+        .from("votes")
+        .insert({ user_id: userId, project_id: projectId });
+
+      if (createError) {
+        // eslint-disable-next-line no-console
+        console.error("supabase create vote error:", createError);
+
+        return NextResponse.json(
+          { success: false, error: "服务器错误" },
+          { status: 500 },
+        );
+      }
     } else if (action === "remove") {
       if (!existingVote) {
         return NextResponse.json(
@@ -84,20 +121,33 @@ export async function POST(
       }
 
       // 删除投票
-      await prisma.vote.delete({
-        where: {
-          userId_projectId: {
-            userId,
-            projectId,
-          },
-        },
-      });
+      const { error: deleteError } = await supabase
+        .from("votes")
+        .delete()
+        .match({ user_id: userId, project_id: projectId });
+
+      if (deleteError) {
+        // eslint-disable-next-line no-console
+        console.error("supabase delete vote error:", deleteError);
+
+        return NextResponse.json(
+          { success: false, error: "服务器错误" },
+          { status: 500 },
+        );
+      }
     }
 
     // 获取更新后的投票数
-    const votesCount = await prisma.vote.count({
-      where: { projectId },
-    });
+    const { count, error: countError } = await supabase
+      .from("votes")
+      .select("id", { count: "exact" })
+      .eq("project_id", projectId);
+
+    if (countError) {
+      void countError;
+    }
+
+    const votesCount = typeof count === "number" ? count : 0;
 
     const hasVoted = action === "upvote";
 
@@ -107,6 +157,7 @@ export async function POST(
       hasVoted,
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("投票失败:", error);
 
     return NextResponse.json(

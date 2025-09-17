@@ -7,7 +7,8 @@ import { HeroUIProvider } from "@heroui/system";
 import { ToastProvider } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { SessionProvider } from "next-auth/react";
+
+import { SupabaseProvider } from "./supabase-provider";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -26,7 +27,7 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   const router = useRouter();
 
   return (
-    <SessionProvider>
+    <SupabaseProvider>
       <HeroUIProvider navigate={router.push}>
         <NextThemesProvider {...themeProps}>
           <div className="fixed z-[100]">
@@ -35,6 +36,6 @@ export function Providers({ children, themeProps }: ProvidersProps) {
           {children}
         </NextThemesProvider>
       </HeroUIProvider>
-    </SessionProvider>
+    </SupabaseProvider>
   );
 }

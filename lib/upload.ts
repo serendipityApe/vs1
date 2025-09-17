@@ -20,5 +20,14 @@ export async function uploadFiles(files: File[]): Promise<string[]> {
 
   const data = await response.json();
 
-  return data.files.map((file: any) => file.url);
+  // require storagePath (id) returned by the upload API.
+  // Fallback to throwing an error rather than returning a signed URL,
+  // to avoid accidentally storing ephemeral URLs in the database.
+  const ids = data.files.map((file: any) => file.storagePath);
+
+  if (ids.some((id: any) => !id)) {
+    throw new Error("上传失败：服务器未返回 storagePath，请检查上传接口");
+  }
+
+  return ids;
 }
