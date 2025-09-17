@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Chip } from "@heroui/chip";
@@ -10,6 +9,7 @@ import { Avatar } from "@heroui/avatar";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+import { useSupabase } from "@/app/supabase-provider";
 import CommentsSection from "@/components/comments/CommentsSection";
 import { ImageCarousel } from "@/components/ui/image-carousel";
 import { handleApiError, showSuccessToast } from "@/lib/toast";
@@ -41,7 +41,7 @@ export default function ProjectDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { user, signInWithOAuth } = useSupabase();
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isVoting, setIsVoting] = useState(false);
@@ -60,7 +60,11 @@ export default function ProjectDetailPage({
       const data = await response.json();
 
       if (response.ok) {
-        setProject(data.project);
+        const proj = data.project;
+
+        // server now returns signed URLs directly as project.logoUrl and project.galleryUrls
+
+        setProject(proj);
       } else {
         handleApiError(
           { response: { status: response.status, data } },
@@ -77,8 +81,9 @@ export default function ProjectDetailPage({
   };
 
   const handleVote = async (action: "upvote" | "remove") => {
-    if (!session) {
-      router.push("/api/auth/signin");
+    if (!user) {
+      // prompt Supabase OAuth login
+      await signInWithOAuth("github");
 
       return;
     }

@@ -1,15 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import {
+  getUserFromRequest,
+  supabase,
+  setSessionCookies,
+} from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const { user, session } = await getUserFromRequest(req as Request);
 
-    if (!session?.user?.id) {
-      return NextResponse.json(
+    const makeResponse = (body: any, opts?: any) => {
+      const res = NextResponse.json(body, opts);
+
+      if (session?.isRefreshed) {
+        try {
+          setSessionCookies(res, session);
+        } catch {
+          // ignore
+        }
+      }
+
+      return res;
+    };
+
+    if (!user?.id) {
+      return makeResponse(
         { success: false, errors: ["未登录"] },
         { status: 401 },
       );
@@ -69,48 +85,65 @@ export async function POST(req: NextRequest) {
       tagsString = JSON.stringify(validTags);
     }
 
-    // 处理图片URL数组 - 将数组转换为JSON字符串
-    let galleryUrlsString = null;
+    // 处理图片 id 数组（前端现在应传 storagePath 或 id），将数组转换为 JSON 字符串
+    let galleryIdsString = null;
 
     if (galleryUrls && Array.isArray(galleryUrls)) {
-      const validUrls = galleryUrls
-        .filter((url) => typeof url === "string" && url.trim())
+      const validIds = galleryUrls
+        .filter((id) => typeof id === "string" && id.trim())
         .slice(0, 5); // 最多5张图片
 
-      if (validUrls.length > 0) {
-        galleryUrlsString = JSON.stringify(validUrls);
+      if (validIds.length > 0) {
+        galleryIdsString = JSON.stringify(validIds);
       }
     }
 
-    // 创建项目
-    const project = await prisma.project.create({
-      data: {
+    // 创建项目（Supabase）
+    // 为了兼容现有 DB schema，我们把 storage id (例如 projects/xxx.png) 存入
+    // 现有的 `logo_url` 与 `gallery_urls` 字段中。前端和读取逻辑会把这些值视为 ids。
+
+    const { data: inserted, error: insertError } = await supabase
+      .from("projects")
+      .insert({
         title,
         tagline,
         url: url || null,
         confession,
-        imageUrl: imageUrl || null,
-        logoUrl: logoUrl || null,
-        galleryUrls: galleryUrlsString,
+        image_url: imageUrl || null,
+        logo_url: logoUrl || null,
+        gallery_urls: galleryIdsString,
         tags: tagsString,
-        failureType: failureType || null,
-        authorId: session.user.id,
-      },
-      include: {
-        author: {
-          select: {
-            username: true,
-            avatarUrl: true,
-          },
-        },
-        _count: {
-          select: {
-            votes: true,
-            comments: true,
-          },
-        },
-      },
-    });
+        failure_type: failureType || null,
+        author_id: user.id,
+      })
+      .select(
+        "id, title, tagline, url, confession, image_url, logo_url, gallery_urls, tags, failure_type, created_at, author:users(username,avatar_url)",
+      );
+
+    if (insertError) {
+      // eslint-disable-next-line no-console
+      console.error("supabase insert project error:", insertError);
+
+      return NextResponse.json(
+        { success: false, errors: ["服务器错误"] },
+        { status: 500 },
+      );
+    }
+
+    const project = inserted?.[0];
+    const authorObj = Array.isArray(project?.author)
+      ? (project.author?.[0] ?? null)
+      : (project.author ?? null);
+
+    // 计算 counts
+    const { count: votesCount } = await supabase
+      .from("votes")
+      .select("id", { count: "exact" })
+      .eq("project_id", project.id);
+    const { count: commentsCount } = await supabase
+      .from("comments")
+      .select("id", { count: "exact" })
+      .eq("project_id", project.id);
 
     return NextResponse.json({
       success: true,
@@ -120,18 +153,28 @@ export async function POST(req: NextRequest) {
         tagline: project.tagline,
         url: project.url,
         confession: project.confession,
-        imageUrl: project.imageUrl,
-        logoUrl: project.logoUrl,
-        galleryUrls: project.galleryUrls ? JSON.parse(project.galleryUrls) : [],
-        tags: JSON.parse(project.tags),
-        failureType: project.failureType,
-        createdAt: project.createdAt.toISOString(),
-        votesCount: project._count.votes,
-        commentsCount: project._count.comments,
-        author: project.author,
+        imageUrl: project.image_url ?? null,
+        logoId: project.logo_url ?? null,
+        galleryIds: project.gallery_urls
+          ? JSON.parse(project.gallery_urls)
+          : [],
+        tags: project.tags ? JSON.parse(project.tags) : [],
+        failureType: project.failure_type ?? null,
+        createdAt: project.created_at
+          ? new Date(project.created_at).toISOString()
+          : null,
+        votesCount: typeof votesCount === "number" ? votesCount : 0,
+        commentsCount: typeof commentsCount === "number" ? commentsCount : 0,
+        author: authorObj
+          ? {
+              username: authorObj.username,
+              avatarUrl: authorObj.avatar_url ?? null,
+            }
+          : null,
       },
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("项目提交失败:", error);
 
     return NextResponse.json(

@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { Button } from "@heroui/button";
 import { Input, Textarea } from "@heroui/input";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Chip } from "@heroui/chip";
-import { Link } from "@heroui/link";
 import { Lightbulb, AlertTriangle } from "lucide-react";
 
+import { useSupabase } from "@/app/supabase-provider";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { FailureTypeSelector } from "@/components/ui/failure-type-selector";
 import { handleApiError, showSuccessToast } from "@/lib/toast";
@@ -17,7 +16,8 @@ import { uploadFiles } from "@/lib/upload";
 
 export default function SubmitPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { user, signInWithOAuth, signInWithEmail } = useSupabase();
+  // using `user` directly for auth gating
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -32,15 +32,7 @@ export default function SubmitPage() {
     galleryFiles: [] as File[],
   });
 
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!session) {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <Card className="max-w-md w-full">
@@ -50,9 +42,37 @@ export default function SubmitPage() {
             <p className="text-foreground-600 mb-6">
               Please log in to submit your shit project
             </p>
-            <Button as={Link} color="primary" href="/api/auth/signin" size="lg">
-              Login with GitHub
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button
+                color="primary"
+                size="lg"
+                onPress={async () => {
+                  await signInWithOAuth("github");
+                }}
+              >
+                Login with GitHub
+              </Button>
+              <Button
+                color="secondary"
+                size="lg"
+                onPress={async () => {
+                  await signInWithOAuth("google");
+                }}
+              >
+                Continue with Google
+              </Button>
+              <Button
+                color="default"
+                size="lg"
+                onPress={async () => {
+                  const email = window.prompt("Enter your email to sign in:");
+
+                  if (email) await signInWithEmail(email);
+                }}
+              >
+                Sign in with Email
+              </Button>
+            </div>
           </CardBody>
         </Card>
       </div>
@@ -81,20 +101,20 @@ export default function SubmitPage() {
     setIsLoading(true);
 
     try {
-      // 上传Logo
-      let logoUrl = null;
+      // 上传Logo -> 返回 storage id (e.g. projects/<filename>)
+      let logoId = null;
 
       if (formData.logoFiles.length > 0) {
-        const logoUrls = await uploadFiles(formData.logoFiles);
+        const logoIds = await uploadFiles(formData.logoFiles);
 
-        logoUrl = logoUrls[0];
+        logoId = logoIds[0];
       }
 
-      // 上传图片库
-      let galleryUrls: string[] = [];
+      // 上传图片库 -> 返回 storage ids 数组
+      let galleryIds: string[] = [];
 
       if (formData.galleryFiles.length > 0) {
-        galleryUrls = await uploadFiles(formData.galleryFiles);
+        galleryIds = await uploadFiles(formData.galleryFiles);
       }
 
       const response = await fetch("/api/projects/submit", {
@@ -107,8 +127,9 @@ export default function SubmitPage() {
           tagline: formData.tagline,
           url: formData.url || undefined,
           confession: formData.confession,
-          logoUrl,
-          galleryUrls,
+          // 传入 storage ids 而非公开 URL
+          logoUrl: logoId,
+          galleryUrls: galleryIds,
           tags: formData.tags,
           failureType: formData.failureType,
         }),
@@ -119,13 +140,13 @@ export default function SubmitPage() {
       if (data.success) {
         showSuccessToast(
           "Submission Success!",
-          "Your shit project has been submitted successfully"
+          "Your shit project has been submitted successfully",
         );
         router.push(`/projects/${data.project.id}`);
       } else {
         handleApiError(
           { response: { status: 400, data: { message: data.errors?.[0] } } },
-          data.errors?.[0] || "Submission failed"
+          data.errors?.[0] || "Submission failed",
         );
       }
     } catch (error) {

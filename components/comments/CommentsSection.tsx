@@ -1,15 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Textarea } from "@heroui/input";
-import { Link } from "@heroui/link";
 
 import CommentItem from "./CommentItem";
 
 import { handleApiError, showSuccessToast, showErrorToast } from "@/lib/toast";
+import { useSupabase } from "@/app/supabase-provider";
 
 interface Comment {
   id: string;
@@ -34,7 +33,7 @@ export default function CommentsSection({
   projectId,
   projectAuthorId,
 }: CommentsSectionProps) {
-  const { data: session } = useSession();
+  const { user, signInWithOAuth } = useSupabase();
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,7 +66,9 @@ export default function CommentsSection({
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!session) {
+    if (!user) {
+      showErrorToast("请先登录");
+
       return;
     }
 
@@ -153,7 +154,7 @@ export default function CommentsSection({
 
       <CardBody className="space-y-6">
         {/* 发布评论表单 */}
-        {session ? (
+        {user ? (
           <form className="space-y-4" onSubmit={handleSubmitComment}>
             <Textarea
               description={`${newComment.length}/1000 字符`}
@@ -179,10 +180,11 @@ export default function CommentsSection({
           <div className="text-center p-6 bg-content2 rounded-lg">
             <p className="text-foreground-600 mb-4">请登录后参与讨论</p>
             <Button
-              as={Link}
               color="primary"
-              href="/api/auth/signin"
               variant="bordered"
+              onPress={async () => {
+                await signInWithOAuth("github");
+              }}
             >
               GitHub 登录
             </Button>
@@ -210,7 +212,7 @@ export default function CommentsSection({
                     <CommentItem
                       key={comment.id}
                       comment={comment}
-                      currentUserId={session?.user?.id}
+                      currentUserId={user?.id}
                       projectAuthorId={projectAuthorId}
                       projectId={projectId}
                       onReplyAdded={handleReplyAdded}
@@ -235,7 +237,7 @@ export default function CommentsSection({
                     <CommentItem
                       key={comment.id}
                       comment={comment}
-                      currentUserId={session?.user?.id}
+                      currentUserId={user?.id}
                       projectAuthorId={projectAuthorId}
                       projectId={projectId}
                       onReplyAdded={handleReplyAdded}
