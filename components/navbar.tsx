@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -25,6 +26,7 @@ import clsx from "clsx";
 
 import { useSupabase } from "@/app/supabase-provider";
 import { ThemeSwitch } from "@/components/theme-switch";
+import { LogoIcon, LoginIcon } from "@/components/icons";
 
 const navItems = [
   { label: "Leaderboard", href: "/" },
@@ -40,6 +42,16 @@ const navMenuItems = [
 
 export const Navbar = () => {
   const { supabase, user, session } = useSupabase();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 12);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const status: "loading" | "authenticated" | "unauthenticated" =
     session === undefined
@@ -64,23 +76,20 @@ export const Navbar = () => {
 
   return (
     <HeroUINavbar
-      className="border-b border-divider bg-background/70 backdrop-blur-md"
-      maxWidth="xl"
-      position="sticky"
+      className={clsx(
+        "backdrop-blur-md transition-all duration-300 ease-in-out",
+        isScrolled
+          ? "fixed top-2 left-1/2 transform -translate-x-1/2 w-[800px] bg-background/90 border border-divider rounded-full shadow-lg z-50"
+          : "border-b border-divider bg-background/70 w-full"
+      )}
+      maxWidth={isScrolled ? "full" : "xl"}
+      position={isScrolled ? "static" : "sticky"}
     >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-3" href="/">
-            <div className="w-8 h-8 relative">
-              <Image
-                alt="Vibe Shit Logo"
-                className="w-full h-full"
-                height={32}
-                src="/logo.svg"
-                width={32}
-              />
-            </div>
-            <div className="hidden sm:block">
+            <LogoIcon className="w-8 h-8 text-primary" />
+            <div className={clsx("hidden sm:block", isScrolled && "hidden")}>
               <p className="font-bold text-inherit text-lg">Vibe Shit</p>
               <p className="text-xs text-foreground-600 leading-none">
                 A showcase of glorious failures
@@ -88,14 +97,19 @@ export const Navbar = () => {
             </div>
           </NextLink>
         </NavbarBrand>
-        <ul className="hidden md:flex gap-6 justify-start ml-6">
-          {navItems.map((item) => (
+        <ul
+          className={clsx(
+            "hidden gap-6 justify-start ml-6",
+            isScrolled ? "lg:flex" : "md:flex"
+          )}
+        >
+          {/* {navItems.map((item) => (
             <NavbarItem key={item.href}>
               <NextLink
                 className={clsx(
                   linkStyles({ color: "foreground" }),
                   "data-[active=true]:text-primary data-[active=true]:font-medium",
-                  "hover:text-primary transition-colors",
+                  "hover:text-primary transition-colors"
                 )}
                 color="foreground"
                 href={item.href}
@@ -103,7 +117,7 @@ export const Navbar = () => {
                 {item.label}
               </NextLink>
             </NavbarItem>
-          ))}
+          ))} */}
         </ul>
       </NavbarContent>
 
@@ -121,14 +135,20 @@ export const Navbar = () => {
             </Button>
           ) : session ? (
             <>
-              <Button as={NextLink} color="primary" href="/submit" size="sm">
+              <Button
+                as={NextLink}
+                color="primary"
+                radius="full"
+                href="/submit"
+                size="sm"
+              >
                 Submit Shit
               </Button>
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
                   <Avatar
                     as="button"
-                    className="transition-transform"
+                    className="transition-transform cursor-pointer"
                     name={displayName || "User"}
                     size="sm"
                     src={avatarSrc}
@@ -161,12 +181,17 @@ export const Navbar = () => {
             </>
           ) : (
             <>
-              <Button size="sm" variant="ghost" onPress={handleSignIn}>
-                Login
+              <Button
+                color="primary"
+                startContent={<LoginIcon className="w-4 h-4" />}
+                radius="full"
+                onPress={handleSignIn}
+              >
+                Sign in
               </Button>
-              <Button color="primary" size="sm" onPress={handleSignIn}>
+              {/* <Button radius="full" variant="ghost" onPress={handleSignIn}>
                 Submit Shit
-              </Button>
+              </Button> */}
             </>
           )}
         </NavbarItem>

@@ -49,7 +49,7 @@ export default function Home() {
       } else {
         handleApiError(
           { response: { status: response.status, data } },
-          "获取项目列表失败",
+          "获取项目列表失败"
         );
       }
     } catch (error) {
@@ -125,26 +125,19 @@ export default function Home() {
         </div> */}
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-12">
+        {/* <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-12">
           <Button
             className="font-semibold"
             color="primary"
-            endContent={
-              <Image
-                alt="Vote"
-                className="w-5 h-5 color-white"
-                height={20}
-                src="/logo.svg"
-                width={20}
-              />
-            }
             size="lg"
+            radius="full"
             onPress={() => router.push("/submit")}
           >
             Submit Your Shit
           </Button>
           <Button
             size="lg"
+            radius="full"
             variant="bordered"
             onPress={() => {
               document
@@ -154,7 +147,7 @@ export default function Home() {
           >
             Browse Today&apos;s Shit
           </Button>
-        </div>
+        </div> */}
       </div>
 
       {/* Features */}
@@ -195,12 +188,12 @@ export default function Home() {
 
       {/* Today's Top Shit */}
       <div className="w-full max-w-6xl mx-auto" id="leaderboard">
-        <div className="text-center mb-8">
+        {/* <div className="text-center mb-8">
           <h2 className="text-3xl font-bold mb-2">Shit Leaderboard</h2>
           <p className="text-foreground-600">
             Most popular failure masterpieces
           </p>
-        </div>
+        </div> */}
 
         {isLoading ? (
           <Card className="p-8">
@@ -229,30 +222,30 @@ export default function Home() {
                 key={project.id}
                 className="hover:shadow-lg transition-shadow"
               >
-                <CardBody className="p-6">
+                <CardBody className="p-4">
                   <div className="flex items-start gap-4">
                     {/* 排名 */}
-                    <div className="flex-shrink-0">
+                    {/* <div className="flex-shrink-0">
                       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-warning flex items-center justify-center font-bold text-white text-lg">
                         {index + 1}
                       </div>
-                    </div>
+                    </div> */}
 
                     {/* 项目图片 */}
                     {(project.logoUrl ||
                       project.imageUrl ||
                       project.galleryUrls.length > 0) && (
-                      <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 relative">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 relative">
                         <Image
                           alt={project.title}
                           className="w-full h-full object-cover"
-                          height={64}
+                          height={48}
                           src={
                             project.logoUrl ||
                             project.imageUrl ||
                             project.galleryUrls[0]
                           }
-                          width={64}
+                          width={48}
                         />
                       </div>
                     )}
@@ -261,7 +254,7 @@ export default function Home() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
-                          <h3 className="text-xl font-bold mb-1 text-foreground-900">
+                          <h3 className="text-16 font-bold mb-1 text-foreground-900">
                             <Link
                               className="hover:text-primary transition-colors"
                               href={`/projects/${project.id}`}
@@ -272,6 +265,26 @@ export default function Home() {
                           <p className="text-foreground-600 text-sm mb-3">
                             {project.tagline}
                           </p>
+                          {/* 标签 */}
+                          {project.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              {project.tags.slice(0, 3).map((tag) => (
+                                <Chip
+                                  key={tag}
+                                  color="warning"
+                                  size="sm"
+                                  variant="light"
+                                >
+                                  {tag}
+                                </Chip>
+                              ))}
+                              {project.tags.length > 3 && (
+                                <Chip color="warning" size="sm" variant="light">
+                                  +{project.tags.length - 3}
+                                </Chip>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         {/* 统计信息 */}
@@ -295,29 +308,8 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* 标签 */}
-                      {project.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {project.tags.slice(0, 3).map((tag) => (
-                            <Chip
-                              key={tag}
-                              color="warning"
-                              size="sm"
-                              variant="light"
-                            >
-                              {tag}
-                            </Chip>
-                          ))}
-                          {project.tags.length > 3 && (
-                            <Chip color="warning" size="sm" variant="light">
-                              +{project.tags.length - 3}
-                            </Chip>
-                          )}
-                        </div>
-                      )}
-
                       {/* 作者和时间 */}
-                      <div className="flex items-center gap-2 text-sm text-foreground-500">
+                      {/* <div className="flex items-center gap-2 text-sm text-foreground-500">
                         <Avatar
                           className="w-5 h-5"
                           name={project.author.username}
@@ -327,7 +319,7 @@ export default function Home() {
                         <span>{project.author.username}</span>
                         <span>•</span>
                         <span>{formatDate(project.createdAt)}</span>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </CardBody>
