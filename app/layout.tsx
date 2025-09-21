@@ -10,11 +10,11 @@ import { Navbar } from "@/components/navbar";
 
 export const metadata: Metadata = {
   title: {
-    default: "Vibe Shit - 辉煌的失败展示台",
+    default: "Vibe Shit - The Hall of Glorious Failures",
     template: `%s - Vibe Shit`,
   },
   description:
-    "一个专门展示辉煌失败编程项目的平台。在这里，bug不是缺陷，而是特色。",
+    "A platform dedicated to showcasing glorious programming failures. Here, bugs aren't flaws - they're features.",
   icons: {
     icon: "/favicon.ico",
   },
@@ -50,7 +50,7 @@ export default function RootLayout({
             <footer className="w-full flex items-center justify-center py-6 border-t border-divider">
               <div className="flex flex-col items-center gap-2 text-center">
                 <p className="text-sm text-foreground-600">
-                  © 2024 Vibe Shit. 庆祝每一个辉煌的失败。
+                  © 2024 Vibe Shit. Celebrating every glorious failure.
                 </p>
                 <Link
                   isExternal

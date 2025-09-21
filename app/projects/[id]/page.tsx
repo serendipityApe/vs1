@@ -14,6 +14,7 @@ import CommentsSection from "@/components/comments/CommentsSection";
 import { ImageCarousel } from "@/components/ui/image-carousel";
 import { handleApiError, showSuccessToast } from "@/lib/toast";
 import { LoadingPage } from "@/components/ui/Loading";
+import { CalendarIcon } from "@/components/icons";
 
 interface Project {
   id: string;
@@ -69,12 +70,12 @@ export default function ProjectDetailPage({
       } else {
         handleApiError(
           { response: { status: response.status, data } },
-          data.error || "加载项目失败"
+          data.error || "Failed to load project"
         );
         setProject(null);
       }
     } catch (error) {
-      handleApiError(error, "获取项目失败");
+      handleApiError(error, "Failed to fetch project");
       setProject(null);
     } finally {
       setIsLoading(false);
@@ -114,17 +115,17 @@ export default function ProjectDetailPage({
             : null
         );
         showSuccessToast(
-          action === "upvote" ? "点赞成功！" : "取消点赞",
-          "感谢你的参与"
+          action === "upvote" ? "Upvoted successfully!" : "Upvote removed",
+          "Thanks for your participation"
         );
       } else {
         handleApiError(
           { response: { status: 400, data } },
-          data.error || "投票失败"
+          data.error || "Voting failed"
         );
       }
     } catch (error) {
-      handleApiError(error, "投票失败");
+      handleApiError(error, "Voting failed");
     } finally {
       setIsVoting(false);
     }
@@ -140,12 +141,12 @@ export default function ProjectDetailPage({
         <Card className="max-w-md w-full">
           <CardBody className="text-center p-8">
             <div className="text-6xl mb-4">😵</div>
-            <h1 className="text-2xl font-bold mb-4">项目不存在</h1>
+            <h1 className="text-2xl font-bold mb-4">Project Not Found</h1>
             <p className="text-foreground-600 mb-6">
-              该项目可能已被删除或不存在
+              This project may have been deleted or does not exist
             </p>
             <Button color="primary" onPress={() => router.push("/")}>
-              回到首页
+              Back to Home
             </Button>
           </CardBody>
         </Card>
@@ -165,12 +166,12 @@ export default function ProjectDetailPage({
 
   const getFailureTypeLabel = (type: string) => {
     const failureTypes: Record<string, string> = {
-      abandoned: "烂尾项目",
-      overengineered: "过度工程",
-      "ai-disaster": "AI灾难",
-      "ui-nightmare": "UI噩梦",
-      performance: "性能地狱",
-      security: "安全漏洞",
+      abandoned: "Abandoned Project",
+      overengineered: "Over-engineered",
+      "ai-disaster": "AI Disaster",
+      "ui-nightmare": "UI Nightmare",
+      performance: "Performance Hell",
+      security: "Security Vulnerability",
     };
 
     return failureTypes[type] || type;
@@ -192,18 +193,18 @@ export default function ProjectDetailPage({
               variant="ghost"
               onPress={() => router.push("/")}
             >
-              返回排行榜
+              Back to Leaderboard
             </Button>
             <div className="flex items-center gap-3">
               <Button size="sm" startContent="📤" variant="bordered">
-                分享
+                Share
               </Button>
               <Button
                 color="primary"
                 size="sm"
                 onPress={() => router.push("/submit")}
               >
-                提交你的垃圾
+                Submit Your Project
               </Button>
             </div>
           </div>
@@ -278,7 +279,7 @@ export default function ProjectDetailPage({
                   <span>by {project.author.username}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span>📅</span>
+                  <CalendarIcon className="w-4 h-4" />
                   <span>{formatDate(project.createdAt)}</span>
                 </div>
               </div>
@@ -322,7 +323,7 @@ export default function ProjectDetailPage({
                 variant="bordered"
               >
                 <span className="mr-2">🔗</span>
-                查看项目
+                View Project
               </Button>
             )}
             <Button
@@ -333,7 +334,7 @@ export default function ProjectDetailPage({
               variant="bordered"
             >
               <span className="mr-2">🐛</span>
-              查看作者
+              View Author
             </Button>
           </div>
         </section>
@@ -341,7 +342,7 @@ export default function ProjectDetailPage({
         {/* 项目图片库 */}
         {project.galleryUrls.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold mb-4">项目展示</h2>
+            <h2 className="text-xl font-bold mb-4">Project Gallery</h2>
             <ImageCarousel images={project.galleryUrls} title={project.title} />
           </section>
         )}
@@ -359,10 +360,10 @@ export default function ProjectDetailPage({
                     src="/prize.svg"
                     width={20}
                   />
-                  <h2 className="text-xl font-bold">辉煌忏悔录</h2>
+                  <h2 className="text-xl font-bold">Glorious Confession</h2>
                 </div>
                 <p className="text-sm text-foreground-500">
-                  这个失败杰作是如何诞生的
+                  How this failure masterpiece came to be
                 </p>
               </div>
             </CardHeader>

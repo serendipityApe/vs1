@@ -94,11 +94,11 @@ export default function CommentItem({
       } else {
         handleApiError(
           { response: { status: 400, data } },
-          data.error || "发布回复失败",
+          data.error || "Failed to post reply",
         );
       }
     } catch (error) {
-      handleApiError(error, "发布回复失败");
+      handleApiError(error, "Failed to post reply");
     } finally {
       setIsSubmittingReply(false);
     }

@@ -54,11 +54,11 @@ export default function CommentsSection({
       } else {
         handleApiError(
           { response: { status: response.status, data } },
-          data.error || "加载评论失败",
+          data.error || "Failed to load comments",
         );
       }
     } catch (error) {
-      handleApiError(error, "获取评论失败");
+      handleApiError(error, "Failed to fetch comments");
     } finally {
       setIsLoading(false);
     }
@@ -68,13 +68,13 @@ export default function CommentsSection({
     e.preventDefault();
 
     if (!user) {
-      showErrorToast("请先登录");
+      showErrorToast("Please log in first");
 
       return;
     }
 
     if (!newComment.trim()) {
-      showErrorToast("评论内容不能为空");
+      showErrorToast("Comment cannot be empty");
 
       return;
     }
@@ -108,15 +108,15 @@ export default function CommentsSection({
           return [...prev, newCommentData];
         });
         setNewComment("");
-        showSuccessToast("评论发布成功！", "感谢你的参与讨论");
+        showSuccessToast("Comment posted successfully!", "Thanks for joining the discussion");
       } else {
         handleApiError(
           { response: { status: 400, data } },
-          data.error || "发布评论失败",
+          data.error || "Failed to post comment",
         );
       }
     } catch (error) {
-      handleApiError(error, "发布评论失败");
+      handleApiError(error, "Failed to post comment");
     } finally {
       setIsSubmitting(false);
     }
@@ -149,8 +149,8 @@ export default function CommentsSection({
   return (
     <Card>
       <CardHeader>
-        <h3 className="text-xl font-bold">讨论 ({totalComments})</h3>
-        <p className="text-sm text-foreground-500">参与这个辉煌失败的讨论</p>
+        <h3 className="text-xl font-bold">Discussion ({totalComments})</h3>
+        <p className="text-sm text-foreground-500">Join the discussion about this glorious failure</p>
       </CardHeader>
 
       <CardBody className="space-y-6">
@@ -158,10 +158,10 @@ export default function CommentsSection({
         {user ? (
           <form className="space-y-4" onSubmit={handleSubmitComment}>
             <Textarea
-              description={`${newComment.length}/1000 字符`}
+              description={`${newComment.length}/1000 characters`}
               maxLength={1000}
               minRows={4}
-              placeholder="分享你的想法、类似经历，或者单纯地欣赏这个混乱..."
+              placeholder="Share your thoughts, similar experiences, or simply appreciate this beautiful chaos..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
             />
@@ -173,13 +173,13 @@ export default function CommentsSection({
                 isLoading={isSubmitting}
                 type="submit"
               >
-                {isSubmitting ? "发布中..." : "发布评论"}
+                {isSubmitting ? "Posting..." : "Post Comment"}
               </Button>
             </div>
           </form>
         ) : (
           <div className="text-center p-6 bg-content2 rounded-lg">
-            <p className="text-foreground-600 mb-4">请登录后参与讨论</p>
+            <p className="text-foreground-600 mb-4">Please log in to join the discussion</p>
             <Button
               color="primary"
               variant="bordered"
@@ -187,7 +187,7 @@ export default function CommentsSection({
                 await signInWithOAuth("github");
               }}
             >
-              GitHub 登录
+              Sign in with GitHub
             </Button>
           </div>
         )}
@@ -196,7 +196,7 @@ export default function CommentsSection({
         {comments.length === 0 ? (
           <div className="text-center py-8 text-foreground-500">
             <div className="text-4xl mb-4">💬</div>
-            <p>还没有评论，成为第一个发表看法的人吧！</p>
+            <p>No comments yet. Be the first to share your thoughts!</p>
           </div>
         ) : (
           <div className="space-y-6 border-t pt-6">
@@ -205,7 +205,7 @@ export default function CommentsSection({
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-foreground-500">
                   <span>📌</span>
-                  创作者置顶
+                  Pinned by author
                 </div>
                 {comments
                   .filter((comment) => comment.isPinned)
@@ -228,7 +228,7 @@ export default function CommentsSection({
                 {comments.filter((comment) => comment.isPinned).length > 0 && (
                   <div className="border-t pt-6">
                     <div className="text-sm font-medium text-foreground-500 mb-4">
-                      所有评论
+                      All comments
                     </div>
                   </div>
                 )}

@@ -147,7 +147,7 @@ export function ImageUpload({
                 : `Drag and drop images here, or click to select (${images.length}/${maxImages})`}
             </p>
             <p className="text-xs text-foreground-500">
-              支持 PNG, JPG, WebP 格式
+              Supports PNG, JPG, WebP formats
             </p>
             <input
               accept="image/*"

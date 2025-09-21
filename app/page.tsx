@@ -49,11 +49,11 @@ export default function Home() {
       } else {
         handleApiError(
           { response: { status: response.status, data } },
-          "获取项目列表失败"
+          "Failed to fetch project list"
         );
       }
     } catch (error) {
-      handleApiError(error, "获取项目列表失败");
+      handleApiError(error, "Failed to fetch projects");
     } finally {
       setIsLoading(false);
     }
@@ -65,11 +65,11 @@ export default function Home() {
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return "今天";
-    if (diffDays === 1) return "昨天";
-    if (diffDays < 7) return `${diffDays}天前`;
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays} days ago`;
 
-    return date.toLocaleDateString("zh-CN");
+    return date.toLocaleDateString("en-US");
   };
 
   return (
@@ -207,7 +207,7 @@ export default function Home() {
               <div className="text-6xl mb-4">🚧</div>
               <h3 className="text-xl font-semibold mb-2">No Projects Yet</h3>
               <p className="text-foreground-600 mb-6">
-                Be the first brave soul to share a shit project!
+                Be the first brave soul to share a failed project!
               </p>
               <Button color="primary" onPress={() => router.push("/submit")}>
                 Submit First Project
@@ -329,7 +329,7 @@ export default function Home() {
                 variant="bordered"
                 onPress={() => router.push("/projects")}
               >
-                View More Shit Projects
+                View More Projects
               </Button>
             </div>
           </div>
