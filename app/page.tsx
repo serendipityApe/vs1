@@ -209,7 +209,7 @@ export default function Home() {
               <p className="text-foreground-600 mb-6">
                 Be the first brave soul to share a failed project!
               </p>
-              <Button color="primary" onPress={() => router.push("/submit")}>
+              <Button color="primary" radius="full" onPress={() => router.push("/submit")}>
                 Submit First Project
               </Button>
             </CardBody>
@@ -327,6 +327,7 @@ export default function Home() {
               <Button
                 size="lg"
                 variant="bordered"
+                radius="full"
                 onPress={() => router.push("/projects")}
               >
                 View More Projects

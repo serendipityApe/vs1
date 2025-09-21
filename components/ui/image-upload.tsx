@@ -112,6 +112,7 @@ export function ImageUpload({
                 color="danger"
                 size="sm"
                 variant="solid"
+                radius="full"
                 onPress={() => removeImage(index)}
               >
                 <X className="w-3 h-3" />
@@ -161,6 +162,7 @@ export function ImageUpload({
               className="mt-4"
               size="sm"
               variant="bordered"
+              radius="full"
               onPress={() => document.getElementById(inputId)?.click()}
             >
               Choose {type === "logo" ? "Logo" : "Images"}

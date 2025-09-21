@@ -130,7 +130,7 @@ export const Navbar = () => {
         </NavbarItem>
         <NavbarItem className="flex gap-3">
           {status === "loading" ? (
-            <Button isLoading size="sm" variant="ghost">
+            <Button isLoading size="sm" variant="ghost" radius="full">
               Loading
             </Button>
           ) : session ? (
@@ -238,19 +238,20 @@ export const Navbar = () => {
                     color="primary"
                     href="/submit"
                     size="sm"
+                    radius="full"
                   >
                     Submit Shit
                   </Button>
-                  <Button size="sm" variant="ghost" onPress={handleSignOut}>
+                  <Button size="sm" variant="ghost" radius="full" onPress={handleSignOut}>
                     Logout
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button size="sm" variant="ghost" onPress={handleSignIn}>
+                  <Button size="sm" variant="ghost" radius="full" onPress={handleSignIn}>
                     Login
                   </Button>
-                  <Button color="primary" size="sm" onPress={handleSignIn}>
+                  <Button color="primary" size="sm" radius="full" onPress={handleSignIn}>
                     Submit Shit
                   </Button>
                 </>

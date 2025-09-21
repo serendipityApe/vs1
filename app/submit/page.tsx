@@ -46,6 +46,7 @@ export default function SubmitPage() {
               <Button
                 color="primary"
                 size="lg"
+                radius="full"
                 onPress={async () => {
                   await signInWithOAuth("github");
                 }}
@@ -55,6 +56,7 @@ export default function SubmitPage() {
               <Button
                 color="secondary"
                 size="lg"
+                radius="full"
                 onPress={async () => {
                   await signInWithOAuth("google");
                 }}
@@ -64,6 +66,7 @@ export default function SubmitPage() {
               <Button
                 color="default"
                 size="lg"
+                radius="full"
                 onPress={async () => {
                   const email = window.prompt("Enter your email to sign in:");
 
@@ -282,6 +285,7 @@ export default function SubmitPage() {
                 }
                 type="button"
                 variant="bordered"
+                radius="full"
                 onClick={handleAddTag}
               >
                 Add
@@ -379,6 +383,7 @@ export default function SubmitPage() {
                   className="flex-1 sm:flex-none"
                   size="lg"
                   variant="bordered"
+                  radius="full"
                   onPress={() => router.push("/")}
                 >
                   Cancel
@@ -392,6 +397,7 @@ export default function SubmitPage() {
                   isLoading={isLoading}
                   size="lg"
                   type="submit"
+                  radius="full"
                 >
                   {isLoading ? "Submitting..." : "Submit My Failure"}
                 </Button>

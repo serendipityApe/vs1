@@ -172,6 +172,7 @@ export default function CommentsSection({
                 isDisabled={!newComment.trim()}
                 isLoading={isSubmitting}
                 type="submit"
+                radius="full"
               >
                 {isSubmitting ? "Posting..." : "Post Comment"}
               </Button>
@@ -183,6 +184,7 @@ export default function CommentsSection({
             <Button
               color="primary"
               variant="bordered"
+              radius="full"
               onPress={async () => {
                 await signInWithOAuth("github");
               }}

@@ -144,9 +144,10 @@ export default function CommentItem({
                 className="h-8 px-2"
                 size="sm"
                 variant="light"
+                radius="full"
                 onPress={() => setShowReplyForm(!showReplyForm)}
               >
-                回复
+                Reply
               </Button>
             )}
           </div>
@@ -159,7 +160,7 @@ export default function CommentItem({
                   className="min-h-[80px]"
                   maxLength={1000}
                   minRows={2}
-                  placeholder={`回复 @${comment.author.username}...`}
+                  placeholder={`Reply to @${comment.author.username}...`}
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
                 />
@@ -171,18 +172,20 @@ export default function CommentItem({
                     isLoading={isSubmittingReply}
                     size="sm"
                     type="submit"
+                    radius="full"
                   >
-                    {isSubmittingReply ? "发布中..." : "回复"}
+                    {isSubmittingReply ? "Posting..." : "Reply"}
                   </Button>
                   <Button
                     size="sm"
                     variant="bordered"
+                    radius="full"
                     onPress={() => {
                       setShowReplyForm(false);
                       setReplyContent("");
                     }}
                   >
-                    取消
+                    Cancel
                   </Button>
                 </div>
               </form>

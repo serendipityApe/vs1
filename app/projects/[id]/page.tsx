@@ -145,7 +145,7 @@ export default function ProjectDetailPage({
             <p className="text-foreground-600 mb-6">
               This project may have been deleted or does not exist
             </p>
-            <Button color="primary" onPress={() => router.push("/")}>
+            <Button color="primary" radius="full" onPress={() => router.push("/")}>
               Back to Home
             </Button>
           </CardBody>
@@ -191,17 +191,19 @@ export default function ProjectDetailPage({
               size="sm"
               startContent="←"
               variant="ghost"
+              radius="full"
               onPress={() => router.push("/")}
             >
               Back to Leaderboard
             </Button>
             <div className="flex items-center gap-3">
-              <Button size="sm" startContent="📤" variant="bordered">
+              <Button size="sm" startContent="📤" variant="bordered" radius="full">
                 Share
               </Button>
               <Button
                 color="primary"
                 size="sm"
+                radius="full"
                 onPress={() => router.push("/submit")}
               >
                 Submit Your Project
@@ -292,6 +294,7 @@ export default function ProjectDetailPage({
                 color={project.hasVoted ? "primary" : "default"}
                 isLoading={isVoting}
                 size="lg"
+                radius="full"
                 startContent={
                   <Image
                     alt="Vote"
@@ -321,6 +324,7 @@ export default function ProjectDetailPage({
                 rel="noopener noreferrer"
                 target="_blank"
                 variant="bordered"
+                radius="full"
               >
                 <span className="mr-2">🔗</span>
                 View Project
@@ -332,6 +336,7 @@ export default function ProjectDetailPage({
               rel="noopener noreferrer"
               target="_blank"
               variant="bordered"
+              radius="full"
             >
               <span className="mr-2">🐛</span>
               View Author

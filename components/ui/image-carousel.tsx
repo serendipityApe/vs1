@@ -55,6 +55,7 @@ export function ImageCarousel({
                 isIconOnly
                 className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/30 text-white hover:bg-black/50"
                 variant="flat"
+                radius="full"
                 onPress={prevImage}
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -63,6 +64,7 @@ export function ImageCarousel({
                 isIconOnly
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/30 text-white hover:bg-black/50"
                 variant="flat"
+                radius="full"
                 onPress={nextImage}
               >
                 <ChevronRight className="w-4 h-4" />
