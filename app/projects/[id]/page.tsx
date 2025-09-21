@@ -13,6 +13,7 @@ import { useSupabase } from "@/app/supabase-provider";
 import CommentsSection from "@/components/comments/CommentsSection";
 import { ImageCarousel } from "@/components/ui/image-carousel";
 import { handleApiError, showSuccessToast } from "@/lib/toast";
+import { LoadingPage } from "@/components/ui/Loading";
 
 interface Project {
   id: string;
@@ -68,7 +69,7 @@ export default function ProjectDetailPage({
       } else {
         handleApiError(
           { response: { status: response.status, data } },
-          data.error || "加载项目失败",
+          data.error || "加载项目失败"
         );
         setProject(null);
       }
@@ -110,16 +111,16 @@ export default function ProjectDetailPage({
                 votesCount: data.votesCount,
                 hasVoted: data.hasVoted,
               }
-            : null,
+            : null
         );
         showSuccessToast(
           action === "upvote" ? "点赞成功！" : "取消点赞",
-          "感谢你的参与",
+          "感谢你的参与"
         );
       } else {
         handleApiError(
           { response: { status: 400, data } },
-          data.error || "投票失败",
+          data.error || "投票失败"
         );
       }
     } catch (error) {
@@ -130,11 +131,7 @@ export default function ProjectDetailPage({
   };
 
   if (isLoading || !projectId) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">加载中...</div>
-      </div>
-    );
+    return <LoadingPage label="Loading project..." />;
   }
 
   if (!project && !isLoading) {
@@ -186,7 +183,7 @@ export default function ProjectDetailPage({
   return (
     <div className="min-h-screen bg-background">
       {/* 粘性头部 */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      {/* <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 max-w-4xl">
           <div className="flex items-center justify-between">
             <Button
@@ -211,7 +208,7 @@ export default function ProjectDetailPage({
             </div>
           </div>
         </div>
-      </header>
+      </header> */}
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         {/* 项目头部 */}

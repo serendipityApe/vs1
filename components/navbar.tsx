@@ -79,7 +79,7 @@ export const Navbar = () => {
       className={clsx(
         "backdrop-blur-md transition-all duration-300 ease-in-out",
         isScrolled
-          ? "fixed top-2 left-1/2 transform -translate-x-1/2 w-[800px] bg-background/90 border border-divider rounded-full shadow-lg z-50"
+          ? "fixed top-2 left-1/2 transform -translate-x-1/2 w-[864px] bg-background/90 border border-divider rounded-full shadow-lg z-50"
           : "border-b border-divider bg-background/70 w-full"
       )}
       maxWidth={isScrolled ? "full" : "xl"}

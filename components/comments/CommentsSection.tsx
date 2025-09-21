@@ -9,6 +9,7 @@ import CommentItem from "./CommentItem";
 
 import { handleApiError, showSuccessToast, showErrorToast } from "@/lib/toast";
 import { useSupabase } from "@/app/supabase-provider";
+import { LoadingCard } from "@/components/ui/Loading";
 
 interface Comment {
   id: string;
@@ -138,8 +139,8 @@ export default function CommentsSection({
   if (isLoading) {
     return (
       <Card>
-        <CardBody className="text-center py-8">
-          <div className="text-lg">加载评论中...</div>
+        <CardBody>
+          <LoadingCard label="Loading comments..." />
         </CardBody>
       </Card>
     );

@@ -5,11 +5,11 @@ import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/card";
 import { Chip } from "@heroui/chip";
 import { Avatar } from "@heroui/avatar";
-import { Link } from "@heroui/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 import { handleApiError } from "@/lib/toast";
+import { LoadingCard } from "@/components/ui/Loading";
 
 interface Project {
   id: string;
@@ -73,9 +73,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-200px)] flex flex-col items-center justify-center px-4">
+    <div className="min-h-[calc(100vh-200px)] px-4">
       {/* Hero Section */}
-      <div className="text-center max-w-4xl mx-auto mb-12">
+      <div className="text-center max-w-4xl mx-auto my-12">
         {/* Logo */}
         {/* <div className="mb-6">
           <div className="w-20 h-20 mx-auto mb-4">
@@ -196,10 +196,9 @@ export default function Home() {
         </div> */}
 
         {isLoading ? (
-          <Card className="p-8">
-            <CardBody className="text-center">
-              <div className="text-4xl mb-4">⏳</div>
-              <p className="text-foreground-600">Loading...</p>
+          <Card>
+            <CardBody>
+              <LoadingCard label="Loading projects..." />
             </CardBody>
           </Card>
         ) : projects.length === 0 ? (
@@ -220,7 +219,9 @@ export default function Home() {
             {projects.map((project, index) => (
               <Card
                 key={project.id}
-                className="hover:shadow-lg transition-shadow"
+                className="w-full hover:shadow-lg hover:bg-content2/50 transition-all duration-200 cursor-pointer"
+                isPressable
+                onPress={() => router.push(`/projects/${project.id}`)}
               >
                 <CardBody className="p-4">
                   <div className="flex items-start gap-4">
@@ -254,13 +255,8 @@ export default function Home() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
-                          <h3 className="text-16 font-bold mb-1 text-foreground-900">
-                            <Link
-                              className="hover:text-primary transition-colors"
-                              href={`/projects/${project.id}`}
-                            >
-                              {project.title}
-                            </Link>
+                          <h3 className="text-lg font-semibold mb-1 text-foreground-900">
+                            {project.title}
                           </h3>
                           <p className="text-foreground-600 text-sm mb-3">
                             {project.tagline}
