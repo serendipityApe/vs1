@@ -108,7 +108,10 @@ export default function CommentsSection({
           return [...prev, newCommentData];
         });
         setNewComment("");
-        showSuccessToast("Comment posted successfully!", "Thanks for joining the discussion");
+        showSuccessToast(
+          "Comment posted successfully!",
+          "Thanks for joining the discussion",
+        );
       } else {
         handleApiError(
           { response: { status: 400, data } },
@@ -150,7 +153,9 @@ export default function CommentsSection({
     <Card>
       <CardHeader>
         <h3 className="text-xl font-bold">Discussion ({totalComments})</h3>
-        <p className="text-sm text-foreground-500">Join the discussion about this glorious failure</p>
+        <p className="text-sm text-foreground-500">
+          Join the discussion about this glorious failure
+        </p>
       </CardHeader>
 
       <CardBody className="space-y-6">
@@ -171,8 +176,8 @@ export default function CommentsSection({
                 color="primary"
                 isDisabled={!newComment.trim()}
                 isLoading={isSubmitting}
-                type="submit"
                 radius="full"
+                type="submit"
               >
                 {isSubmitting ? "Posting..." : "Post Comment"}
               </Button>
@@ -180,11 +185,13 @@ export default function CommentsSection({
           </form>
         ) : (
           <div className="text-center p-6 bg-content2 rounded-lg">
-            <p className="text-foreground-600 mb-4">Please log in to join the discussion</p>
+            <p className="text-foreground-600 mb-4">
+              Please log in to join the discussion
+            </p>
             <Button
               color="primary"
-              variant="bordered"
               radius="full"
+              variant="bordered"
               onPress={async () => {
                 await signInWithOAuth("github");
               }}

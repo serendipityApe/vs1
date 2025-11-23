@@ -6,7 +6,6 @@ import { Button } from "@heroui/button";
 import { Input, Textarea } from "@heroui/input";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Chip } from "@heroui/chip";
-import { Lightbulb, AlertTriangle } from "lucide-react";
 
 import { useSupabase } from "@/app/supabase-provider";
 import { ImageUpload } from "@/components/ui/image-upload";
@@ -35,45 +34,29 @@ export default function SubmitPage() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <Card className="max-w-md w-full">
+        <Card
+          className="max-w-md w-full border-2 border-foreground shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)]"
+          radius="none"
+        >
           <CardBody className="text-center p-8">
             <div className="text-6xl mb-4">🔒</div>
-            <h1 className="text-2xl font-bold mb-4">Login Required</h1>
-            <p className="text-foreground-600 mb-6">
-              Please log in to submit your shit project
+            <h1 className="text-2xl font-mono font-bold mb-4 uppercase">
+              ACCESS_DENIED
+            </h1>
+            <p className="text-foreground-600 mb-6 font-mono">
+              Auth token missing. Please authenticate to proceed.
             </p>
             <div className="flex flex-col gap-2">
               <Button
+                className="font-bold font-mono uppercase border-2 border-foreground hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
                 color="primary"
+                radius="none"
                 size="lg"
-                radius="full"
                 onPress={async () => {
                   await signInWithOAuth("github");
                 }}
               >
                 Login with GitHub
-              </Button>
-              <Button
-                color="secondary"
-                size="lg"
-                radius="full"
-                onPress={async () => {
-                  await signInWithOAuth("google");
-                }}
-              >
-                Continue with Google
-              </Button>
-              <Button
-                color="default"
-                size="lg"
-                radius="full"
-                onPress={async () => {
-                  const email = window.prompt("Enter your email to sign in:");
-
-                  if (email) await signInWithEmail(email);
-                }}
-              >
-                Sign in with Email
               </Button>
             </div>
           </CardBody>
@@ -160,37 +143,46 @@ export default function SubmitPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <section className="text-center py-6 mb-8">
-        <h2 className="text-3xl font-bold mb-3 text-balance">
-          Share Your <span className="text-primary">Glorious Failure</span>
+    <div className="max-w-4xl mx-auto px-4 py-8 pb-20">
+      <section className="text-center py-6 mb-8 border-b-2 border-foreground">
+        <h2 className="text-4xl font-mono font-black mb-3 text-balance uppercase tracking-tighter">
+          INIT_FAILURE_REPORT
         </h2>
-        <p className="text-lg text-muted-foreground text-pretty max-w-2xl mx-auto">
-          Turn your coding disasters into community entertainment. Every bug is
-          a feature, every crash is a story, and every abandoned project is a
-          badge of honor.
+        <p className="text-lg text-foreground/70 font-mono max-w-2xl mx-auto mb-6">
+          {">"} Document your disaster.
+          <br />
+          {">"} Future generations will learn from your spaghetti.
         </p>
       </section>
 
-      <form className="space-y-6" onSubmit={handleSubmit}>
+      <form className="space-y-8" onSubmit={handleSubmit}>
         {/* Basic Info */}
-        <Card>
-          <CardHeader>
+        <Card
+          className="border-2 border-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)]"
+          radius="none"
+        >
+          <CardHeader className="bg-content2 border-b-2 border-foreground">
             <div className="flex items-center gap-2">
-              <Lightbulb className="w-5 h-5 text-primary" />
-              <h2 className="text-xl font-semibold">Project Details</h2>
+              <div className="font-mono font-bold bg-primary text-black px-2">
+                SECTION_01
+              </div>
+              <h2 className="text-xl font-mono font-bold uppercase">
+                Metadata
+              </h2>
             </div>
-            <p className="text-sm text-foreground-500">
-              Tell us about your magnificent disaster
-            </p>
           </CardHeader>
-          <CardBody className="space-y-4">
+          <CardBody className="space-y-6 p-6">
             <Input
               isRequired
-              description={`${formData.title.length}/100 字符`}
-              label="Project Name *"
+              classNames={{
+                inputWrapper:
+                  "bg-background border-2 border-foreground rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] data-[hover=true]:bg-background group-data-[focus=true]:bg-background",
+                label: "font-mono font-bold uppercase",
+              }}
+              description={`${formData.title.length}/100 chars`}
+              label="Project Name"
               maxLength={100}
-              placeholder="e.g., AI Recipe Generator That Only Makes Sandwiches"
+              placeholder="PROJECT_X_FAILURE_EDITION"
               value={formData.title}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, title: e.target.value }))
@@ -199,10 +191,15 @@ export default function SubmitPage() {
 
             <Input
               isRequired
-              description={`${formData.tagline.length}/60 characters`}
-              label="One-line Description *"
+              classNames={{
+                inputWrapper:
+                  "bg-background border-2 border-foreground rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] data-[hover=true]:bg-background group-data-[focus=true]:bg-background",
+                label: "font-mono font-bold uppercase",
+              }}
+              description={`${formData.tagline.length}/60 chars`}
+              label="One-line Description"
               maxLength={60}
-              placeholder="e.g: Trained on 10,000 recipes, only outputs PB&J variations"
+              placeholder="It was supposed to be Facebook but for cats..."
               value={formData.tagline}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, tagline: e.target.value }))
@@ -210,7 +207,10 @@ export default function SubmitPage() {
             />
 
             <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="failureType">
+              <label
+                className="text-sm font-mono font-bold uppercase"
+                htmlFor="failureType"
+              >
                 Failure Type
               </label>
               <FailureTypeSelector
@@ -224,24 +224,33 @@ export default function SubmitPage() {
         </Card>
 
         {/* Confession */}
-        <Card>
-          <CardHeader>
+        <Card
+          className="border-2 border-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)]"
+          radius="none"
+        >
+          <CardHeader className="bg-content2 border-b-2 border-foreground">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-primary" />
-              <h2 className="text-xl font-semibold">The Confession</h2>
+              <div className="font-mono font-bold bg-primary text-black px-2">
+                SECTION_02
+              </div>
+              <h2 className="text-xl font-mono font-bold uppercase">
+                Post_Mortem
+              </h2>
             </div>
-            <p className="text-sm text-foreground-500">
-              Tell us the full story - what went wrong and why?
-            </p>
           </CardHeader>
-          <CardBody>
+          <CardBody className="p-6">
             <Textarea
               isRequired
-              description={`Be honest, funny, and detailed. The community loves good disaster stories. ${formData.confession.length}/2000`}
-              label="Confession *"
+              classNames={{
+                inputWrapper:
+                  "bg-background border-2 border-foreground rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] data-[hover=true]:bg-background group-data-[focus=true]:bg-background",
+                label: "font-mono font-bold uppercase",
+              }}
+              description={`Traceback of what went wrong. ${formData.confession.length}/2000`}
+              label="Confession Log"
               maxLength={2000}
-              minRows={6}
-              placeholder="I spent 3 months training a recipe neural network, only to discover it learned bread + filling = food. Now it suggests 47 different sandwich variations..."
+              minRows={10}
+              placeholder="> Start log..."
               value={formData.confession}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, confession: e.target.value }))
@@ -251,19 +260,31 @@ export default function SubmitPage() {
         </Card>
 
         {/* Tags */}
-        <Card>
-          <CardHeader>
-            <h2 className="text-xl font-semibold">Tags</h2>
-            <p className="text-sm text-foreground-500">
-              Choose up to 5 tags that describe your failure
-            </p>
+        <Card
+          className="border-2 border-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)]"
+          radius="none"
+        >
+          <CardHeader className="bg-content2 border-b-2 border-foreground">
+            <div className="flex items-center gap-2">
+              <div className="font-mono font-bold bg-primary text-black px-2">
+                SECTION_03
+              </div>
+              <h2 className="text-xl font-mono font-bold uppercase">
+                Keywords
+              </h2>
+            </div>
           </CardHeader>
-          <CardBody className="space-y-4">
+          <CardBody className="space-y-4 p-6">
             <div className="flex gap-2">
               <Input
                 className="flex-1"
+                classNames={{
+                  inputWrapper:
+                    "bg-background border-2 border-foreground rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] data-[hover=true]:bg-background group-data-[focus=true]:bg-background",
+                  label: "font-mono font-bold uppercase",
+                }}
                 label="Add Tag"
-                placeholder="e.g: React, TypeScript, abandoned..."
+                placeholder="TAG_NAME"
                 value={formData.currentTag}
                 onChange={(e) =>
                   setFormData((prev) => ({
@@ -279,48 +300,64 @@ export default function SubmitPage() {
                 }}
               />
               <Button
-                className="mt-2"
+                className="mt-6 h-14 px-8 font-mono font-bold border-2 border-foreground bg-primary text-black"
                 isDisabled={
                   !formData.currentTag.trim() || formData.tags.length >= 5
                 }
+                radius="none"
                 type="button"
-                variant="bordered"
-                radius="full"
                 onClick={handleAddTag}
               >
-                Add
+                ADD
               </Button>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 min-h-[40px] p-4 border-2 border-dashed border-foreground/20">
+              {formData.tags.length === 0 && (
+                <span className="text-foreground/40 font-mono text-sm">
+                  No tags selected
+                </span>
+              )}
               {formData.tags.map((tag) => (
                 <Chip
                   key={tag}
-                  color="primary"
-                  variant="flat"
+                  className="border border-foreground bg-content2 font-mono rounded-none"
+                  variant="bordered"
                   onClose={() => handleRemoveTag(tag)}
                 >
                   {tag}
                 </Chip>
               ))}
             </div>
-            <p className="text-xs text-foreground-500">
-              Selected: {formData.tags.length}/5
+            <p className="text-xs text-foreground-500 font-mono">
+              BUFFER: {formData.tags.length}/5
             </p>
           </CardBody>
         </Card>
 
         {/* Links */}
-        <Card>
-          <CardHeader>
-            <h2 className="text-xl font-semibold">Links (Optional)</h2>
-            <p className="text-sm text-foreground-500">
-              If you dare, share your project and code
-            </p>
+        <Card
+          className="border-2 border-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)]"
+          radius="none"
+        >
+          <CardHeader className="bg-content2 border-b-2 border-foreground">
+            <div className="flex items-center gap-2">
+              <div className="font-mono font-bold bg-primary text-black px-2">
+                SECTION_04
+              </div>
+              <h2 className="text-xl font-mono font-bold uppercase">
+                Reference_Pointer
+              </h2>
+            </div>
           </CardHeader>
-          <CardBody className="space-y-4">
+          <CardBody className="p-6">
             <Input
+              classNames={{
+                inputWrapper:
+                  "bg-background border-2 border-foreground rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] data-[hover=true]:bg-background group-data-[focus=true]:bg-background",
+                label: "font-mono font-bold uppercase",
+              }}
               label="Project URL"
-              placeholder="https://my-failed-project.com"
+              placeholder="https://"
               type="url"
               value={formData.url}
               onChange={(e) =>
@@ -331,14 +368,21 @@ export default function SubmitPage() {
         </Card>
 
         {/* Logo Upload */}
-        <Card>
-          <CardHeader>
-            <h2 className="text-xl font-semibold">Project Logo (Optional)</h2>
-            <p className="text-sm text-foreground-500">
-              Upload a square logo (recommended 64x64px)
-            </p>
+        <Card
+          className="border-2 border-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)]"
+          radius="none"
+        >
+          <CardHeader className="bg-content2 border-b-2 border-foreground">
+            <div className="flex items-center gap-2">
+              <div className="font-mono font-bold bg-primary text-black px-2">
+                ASSET_01
+              </div>
+              <h2 className="text-xl font-mono font-bold uppercase">
+                Icon.ico
+              </h2>
+            </div>
           </CardHeader>
-          <CardBody>
+          <CardBody className="p-6">
             <ImageUpload
               images={formData.logoFiles}
               type="logo"
@@ -350,16 +394,21 @@ export default function SubmitPage() {
         </Card>
 
         {/* Gallery Upload */}
-        <Card>
-          <CardHeader>
-            <h2 className="text-xl font-semibold">
-              Project Gallery (Optional)
-            </h2>
-            <p className="text-sm text-foreground-500">
-              Upload up to 5 screenshots or images to showcase your project
-            </p>
+        <Card
+          className="border-2 border-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)]"
+          radius="none"
+        >
+          <CardHeader className="bg-content2 border-b-2 border-foreground">
+            <div className="flex items-center gap-2">
+              <div className="font-mono font-bold bg-primary text-black px-2">
+                ASSET_02
+              </div>
+              <h2 className="text-xl font-mono font-bold uppercase">
+                Screenshots
+              </h2>
+            </div>
           </CardHeader>
-          <CardBody>
+          <CardBody className="p-6">
             <ImageUpload
               images={formData.galleryFiles}
               type="gallery"
@@ -371,40 +420,31 @@ export default function SubmitPage() {
         </Card>
 
         {/* Submit */}
-        <Card>
-          <CardBody className="pt-6">
-            <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-              <p className="text-sm text-foreground-500">
-                By submitting, you agree to let the community (lovingly) mock
-                your code.
-              </p>
-              <div className="flex gap-4 w-full sm:w-auto">
-                <Button
-                  className="flex-1 sm:flex-none"
-                  size="lg"
-                  variant="bordered"
-                  radius="full"
-                  onPress={() => router.push("/")}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  className="flex-1 sm:flex-none"
-                  color="primary"
-                  isDisabled={
-                    !formData.title || !formData.tagline || !formData.confession
-                  }
-                  isLoading={isLoading}
-                  size="lg"
-                  type="submit"
-                  radius="full"
-                >
-                  {isLoading ? "Submitting..." : "Submit My Failure"}
-                </Button>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
+        <div className="pt-6">
+          <div className="flex flex-col sm:flex-row gap-4 justify-end items-center">
+            <Button
+              className="w-full sm:w-auto font-mono uppercase border-2 border-foreground bg-transparent hover:bg-content2"
+              radius="none"
+              size="lg"
+              variant="bordered"
+              onPress={() => router.push("/")}
+            >
+              Abort
+            </Button>
+            <Button
+              className="w-full sm:w-auto font-mono font-bold uppercase border-2 border-foreground bg-primary text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all"
+              isDisabled={
+                !formData.title || !formData.tagline || !formData.confession
+              }
+              isLoading={isLoading}
+              radius="none"
+              size="lg"
+              type="submit"
+            >
+              {isLoading ? "EXECUTING..." : "COMMIT_FAILURE"}
+            </Button>
+          </div>
+        </div>
       </form>
     </div>
   );

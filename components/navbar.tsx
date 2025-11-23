@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -19,20 +18,11 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@heroui/dropdown";
-import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
-import Image from "next/image";
-import clsx from "clsx";
 
 import { useSupabase } from "@/app/supabase-provider";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { LogoIcon, LoginIcon } from "@/components/icons";
-
-const navItems = [
-  { label: "Leaderboard", href: "/" },
-  { label: "Submit", href: "/submit" },
-  { label: "About", href: "/about" },
-];
 
 const navMenuItems = [
   { label: "Leaderboard", href: "/" },
@@ -42,16 +32,6 @@ const navMenuItems = [
 
 export const Navbar = () => {
   const { supabase, user, session } = useSupabase();
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 12);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const status: "loading" | "authenticated" | "unauthenticated" =
     session === undefined
@@ -76,49 +56,36 @@ export const Navbar = () => {
 
   return (
     <HeroUINavbar
-      className={clsx(
-        "backdrop-blur-md transition-all duration-300 ease-in-out",
-        isScrolled
-          ? "fixed top-2 left-1/2 transform -translate-x-1/2 w-[864px] bg-background/90 border border-divider rounded-full shadow-lg z-50"
-          : "border-b border-divider bg-background/70 w-full"
-      )}
-      maxWidth={isScrolled ? "full" : "xl"}
-      position={isScrolled ? "static" : "sticky"}
+      className="border-b-2 border-divider bg-background"
+      classNames={{
+        item: [
+          "flex",
+          "relative",
+          "h-full",
+          "items-center",
+          "data-[active=true]:after:content-['']",
+          "data-[active=true]:after:absolute",
+          "data-[active=true]:after:bottom-0",
+          "data-[active=true]:after:left-0",
+          "data-[active=true]:after:right-0",
+          "data-[active=true]:after:h-[2px]",
+          "data-[active=true]:after:bg-primary",
+        ],
+      }}
+      maxWidth="xl"
+      position="sticky"
     >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-3" href="/">
             <LogoIcon className="w-8 h-8 text-primary" />
-            <div className={clsx("hidden sm:block", isScrolled && "hidden")}>
-              <p className="font-bold text-inherit text-lg">Vibe Shit</p>
-              <p className="text-xs text-foreground-600 leading-none">
-                A showcase of glorious failures
+            <div className="hidden sm:block">
+              <p className="font-bold font-mono text-xl uppercase tracking-tighter">
+                VIBE_SHIT
               </p>
             </div>
           </NextLink>
         </NavbarBrand>
-        <ul
-          className={clsx(
-            "hidden gap-6 justify-start ml-6",
-            isScrolled ? "lg:flex" : "md:flex"
-          )}
-        >
-          {/* {navItems.map((item) => (
-            <NavbarItem key={item.href}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
-                  "hover:text-primary transition-colors"
-                )}
-                color="foreground"
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
-            </NavbarItem>
-          ))} */}
-        </ul>
       </NavbarContent>
 
       <NavbarContent
@@ -130,51 +97,64 @@ export const Navbar = () => {
         </NavbarItem>
         <NavbarItem className="flex gap-3">
           {status === "loading" ? (
-            <Button isLoading size="sm" variant="ghost" radius="full">
+            <Button
+              isLoading
+              className="font-mono uppercase"
+              radius="none"
+              size="sm"
+              variant="ghost"
+            >
               Loading
             </Button>
           ) : session ? (
             <>
               <Button
                 as={NextLink}
+                className="font-bold font-mono uppercase border-2 border-transparent hover:border-foreground hover:bg-primary/90"
                 color="primary"
-                radius="full"
                 href="/submit"
+                radius="none"
                 size="sm"
               >
-                Submit Shit
+                Submit_Shit
               </Button>
-              <Dropdown placement="bottom-end">
+              <Dropdown placement="bottom-end" radius="none">
                 <DropdownTrigger>
                   <Avatar
                     as="button"
-                    className="transition-transform cursor-pointer"
+                    className="transition-transform cursor-pointer ring-2 ring-primary ring-offset-2 ring-offset-background"
                     name={displayName || "User"}
+                    radius="none"
                     size="sm"
                     src={avatarSrc}
                   />
                 </DropdownTrigger>
-                <DropdownMenu aria-label="User menu" variant="flat">
+                <DropdownMenu
+                  aria-label="User menu"
+                  className="font-mono"
+                  variant="flat"
+                >
                   <DropdownItem key="profile" className="h-14 gap-2">
                     <p className="font-semibold">{displayName}</p>
                     <p className="text-sm text-foreground-500">{user?.email}</p>
                   </DropdownItem>
                   <DropdownItem key="settings" as={NextLink} href="/profile">
-                    Profile
+                    PROFILE
                   </DropdownItem>
                   <DropdownItem
                     key="my-projects"
                     as={NextLink}
                     href="/my-projects"
                   >
-                    My Shit Projects
+                    MY_SHIT
                   </DropdownItem>
                   <DropdownItem
                     key="logout"
+                    className="text-danger"
                     color="danger"
                     onPress={handleSignOut}
                   >
-                    Logout
+                    LOGOUT
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
@@ -182,16 +162,14 @@ export const Navbar = () => {
           ) : (
             <>
               <Button
+                className="font-bold font-mono uppercase border-2 border-transparent hover:border-foreground"
                 color="primary"
+                radius="none"
                 startContent={<LoginIcon className="w-4 h-4" />}
-                radius="full"
                 onPress={handleSignIn}
               >
-                Sign in
+                Login_with_GitHub
               </Button>
-              {/* <Button radius="full" variant="ghost" onPress={handleSignIn}>
-                Submit Shit
-              </Button> */}
             </>
           )}
         </NavbarItem>
@@ -202,13 +180,13 @@ export const Navbar = () => {
         <NavbarMenuToggle />
       </NavbarContent>
 
-      <NavbarMenu>
-        <div className="mx-4 mt-2 flex flex-col gap-2">
+      <NavbarMenu className="bg-background/95 border-t border-divider pt-6 font-mono">
+        <div className="mx-4 flex flex-col gap-4">
           {navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item.href}-${index}`}>
               <Link
-                className="w-full"
-                color={index === 1 ? "primary" : "foreground"}
+                className="w-full text-2xl font-bold uppercase"
+                color="foreground"
                 href={item.href}
                 size="lg"
               >
@@ -217,42 +195,55 @@ export const Navbar = () => {
             </NavbarMenuItem>
           ))}
           <NavbarMenuItem>
-            <div className="flex flex-col gap-2 w-full pt-4 border-t border-divider">
+            <div className="flex flex-col gap-4 w-full pt-6 border-t-2 border-divider">
               {session ? (
                 <>
-                  <div className="flex items-center gap-2 p-2">
+                  <div className="flex items-center gap-4 p-2 border border-divider bg-content1">
                     <Avatar
                       name={displayName || "User"}
-                      size="sm"
+                      radius="none"
+                      size="md"
                       src={avatarSrc}
                     />
                     <div>
-                      <p className="text-sm font-medium">{displayName}</p>
-                      <p className="text-xs text-foreground-500">
+                      <p className="text-base font-bold uppercase">
+                        {displayName}
+                      </p>
+                      <p className="text-xs text-foreground-500 font-mono">
                         {user?.email}
                       </p>
                     </div>
                   </div>
                   <Button
                     as={NextLink}
+                    className="w-full font-bold uppercase border-2 border-transparent"
                     color="primary"
                     href="/submit"
-                    size="sm"
-                    radius="full"
+                    radius="none"
+                    size="lg"
                   >
-                    Submit Shit
+                    Submit_Shit
                   </Button>
-                  <Button size="sm" variant="ghost" radius="full" onPress={handleSignOut}>
+                  <Button
+                    className="w-full font-bold uppercase border-2"
+                    radius="none"
+                    size="lg"
+                    variant="bordered"
+                    onPress={handleSignOut}
+                  >
                     Logout
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button size="sm" variant="ghost" radius="full" onPress={handleSignIn}>
-                    Login
-                  </Button>
-                  <Button color="primary" size="sm" radius="full" onPress={handleSignIn}>
-                    Submit Shit
+                  <Button
+                    className="w-full font-bold uppercase border-2 border-transparent"
+                    color="primary"
+                    radius="none"
+                    size="lg"
+                    onPress={handleSignIn}
+                  >
+                    Login_with_GitHub
                   </Button>
                 </>
               )}

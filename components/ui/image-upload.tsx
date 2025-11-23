@@ -80,8 +80,8 @@ export function ImageUpload({
   const inputId = `${type}-upload-${Math.random().toString(36).substr(2, 9)}`;
 
   return (
-    <div className="space-y-4">
-      {title && <h3 className="text-lg font-medium">{title}</h3>}
+    <div className="space-y-4 font-mono">
+      {title && <h3 className="text-lg font-bold uppercase">{title}</h3>}
       {description && (
         <p className="text-sm text-foreground-500">{description}</p>
       )}
@@ -94,7 +94,7 @@ export function ImageUpload({
           {images.map((file, index) => (
             <div key={index} className="relative group">
               <div
-                className={`bg-content2 rounded-lg overflow-hidden relative ${type === "logo" ? "aspect-square w-32" : "aspect-video"}`}
+                className={`bg-content2 border border-foreground relative ${type === "logo" ? "aspect-square w-32" : "aspect-video"}`}
               >
                 <Image
                   fill
@@ -105,19 +105,18 @@ export function ImageUpload({
                   }
                   src={URL.createObjectURL(file)}
                 />
+                <Button
+                  isIconOnly
+                  className="absolute top-0 right-0 rounded-none h-6 w-6 bg-red-600 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  radius="none"
+                  size="sm"
+                  variant="solid"
+                  onPress={() => removeImage(index)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
               </div>
-              <Button
-                isIconOnly
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                color="danger"
-                size="sm"
-                variant="solid"
-                radius="full"
-                onPress={() => removeImage(index)}
-              >
-                <X className="w-3 h-3" />
-              </Button>
-              <p className="text-xs text-foreground-500 mt-1 truncate">
+              <p className="text-xs text-foreground-500 mt-1 truncate font-mono">
                 {file.name}
               </p>
             </div>
@@ -129,11 +128,12 @@ export function ImageUpload({
       {(type === "logo" ? images.length === 0 : images.length < maxImages) && (
         <Card
           isPressable
-          className={`border-2 border-dashed transition-colors cursor-pointer w-full ${
+          className={`border-2 border-dashed transition-all cursor-pointer w-full ${
             dragActive
-              ? "border-primary bg-primary/5"
-              : "border-default-300 hover:border-default-400"
+              ? "border-primary bg-primary/10"
+              : "border-foreground/50 hover:border-primary hover:bg-content2"
           }`}
+          radius="none"
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
@@ -141,14 +141,14 @@ export function ImageUpload({
           onPress={() => document.getElementById(inputId)?.click()}
         >
           <CardBody className="flex flex-col items-center justify-center p-8 text-center">
-            <Upload className="w-8 h-8 mb-4 text-foreground-400" />
-            <p className="text-sm text-foreground-600 mb-2">
+            <Upload className="w-8 h-8 mb-4 text-foreground" />
+            <p className="text-sm text-foreground font-bold uppercase mb-2">
               {type === "logo"
-                ? "Drag and drop a logo here, or click to select"
-                : `Drag and drop images here, or click to select (${images.length}/${maxImages})`}
+                ? "DROP_LOGO_HERE"
+                : `DROP_IMAGES [${images.length}/${maxImages}]`}
             </p>
-            <p className="text-xs text-foreground-500">
-              Supports PNG, JPG, WebP formats
+            <p className="text-xs text-foreground-500 font-mono">
+              *.png, *.jpg, *.webp allowed
             </p>
             <input
               accept="image/*"
@@ -159,13 +159,13 @@ export function ImageUpload({
               onChange={handleFileInput}
             />
             <Button
-              className="mt-4"
+              className="mt-4 font-bold uppercase border border-foreground"
+              radius="none"
               size="sm"
               variant="bordered"
-              radius="full"
               onPress={() => document.getElementById(inputId)?.click()}
             >
-              Choose {type === "logo" ? "Logo" : "Images"}
+              BROWSE_FILES
             </Button>
           </CardBody>
         </Card>

@@ -1,5 +1,3 @@
-import { CircularProgress } from "@heroui/react";
-
 interface LoadingProps {
   size?: "sm" | "md" | "lg";
   label?: string;
@@ -11,24 +9,20 @@ export const Loading = ({
   size = "md",
   label,
   centered = false,
-  className = ""
+  className = "",
 }: LoadingProps) => {
   const content = (
     <div className={`flex flex-col items-center gap-2 ${className}`}>
-      <CircularProgress
-        size={size}
-        aria-label={label || "Loading..."}
-        color="primary"
-      />
-      {label && (
-        <p className="text-sm text-foreground-600">{label}</p>
-      )}
+      <div className="font-mono font-bold text-primary uppercase animate-pulse">
+        {">"} {label || "LOADING..."}{" "}
+        <span className="inline-block w-2 h-4 bg-primary animate-bounce" />
+      </div>
     </div>
   );
 
   if (centered) {
     return (
-      <div className="flex items-center justify-center min-h-32">
+      <div className="flex items-center justify-center min-h-32 border-2 border-dashed border-foreground/20">
         {content}
       </div>
     );
@@ -39,26 +33,28 @@ export const Loading = ({
 
 // 页面级Loading组件
 export const LoadingPage = ({
-  label = "Loading..."
+  label = "SYSTEM_INITIALIZING...",
 }: {
-  label?: string
+  label?: string;
 }) => {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <Loading size="lg" label={label} />
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="border-2 border-foreground p-8 bg-background shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)]">
+        <Loading label={label} size="lg" />
+      </div>
     </div>
   );
 };
 
 // 卡片内Loading组件
 export const LoadingCard = ({
-  label = "Loading..."
+  label = "FETCHING_DATA...",
 }: {
-  label?: string
+  label?: string;
 }) => {
   return (
-    <div className="text-center py-8">
-      <Loading size="md" label={label} />
+    <div className="text-center py-12 border-2 border-dashed border-foreground/50 bg-content2/50">
+      <Loading label={label} size="md" />
     </div>
   );
 };

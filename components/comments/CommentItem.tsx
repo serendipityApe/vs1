@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
 import { Textarea } from "@heroui/input";
-import { Chip } from "@heroui/chip";
 
 import { handleApiError, showSuccessToast, showErrorToast } from "@/lib/toast";
 
@@ -45,18 +44,14 @@ export default function CommentItem({
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffMinutes = Math.floor(diffTime / (1000 * 60));
-    const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffMinutes < 1) return "刚刚";
-    if (diffMinutes < 60) return `${diffMinutes}分钟前`;
-    if (diffHours < 24) return `${diffHours}小时前`;
-    if (diffDays < 7) return `${diffDays}天前`;
-
-    return date.toLocaleDateString("zh-CN");
+    return date.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
   };
 
   const handleSubmitReply = async (e: React.FormEvent) => {
@@ -65,7 +60,7 @@ export default function CommentItem({
     if (!currentUserId) return;
 
     if (!replyContent.trim()) {
-      showErrorToast("回复内容不能为空");
+      showErrorToast("Reply cannot be empty");
 
       return;
     }
@@ -90,7 +85,7 @@ export default function CommentItem({
         onReplyAdded(comment.id, data.comment);
         setReplyContent("");
         setShowReplyForm(false);
-        showSuccessToast("回复发布成功！");
+        showSuccessToast("Reply posted");
       } else {
         handleApiError(
           { response: { status: 400, data } },
@@ -105,87 +100,82 @@ export default function CommentItem({
   };
 
   return (
-    <div className={isReply ? "ml-8 border-l-2 border-content3 pl-4" : ""}>
-      <div className="flex gap-3">
+    <div
+      className={`font-mono ${isReply ? "ml-4 sm:ml-8 mt-4 border-l-2 border-foreground pl-4" : "border-2 border-foreground p-4 bg-background shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]"}`}
+    >
+      <div className="flex gap-3 items-start">
         <Avatar
-          className="w-8 h-8 flex-shrink-0"
+          className="w-8 h-8 flex-shrink-0 border border-foreground rounded-none"
           name={comment.author.username}
+          radius="none"
           size="sm"
           src={comment.author.avatarUrl}
         />
-        <div className="flex-1 space-y-2">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="font-medium">{comment.author.username}</span>
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2 text-xs mb-2">
+            <span className="font-bold uppercase bg-content2 px-1">
+              {comment.author.username}
+            </span>
             {comment.isAuthor && (
-              <Chip
-                className="text-xs"
-                color="primary"
-                size="sm"
-                variant="flat"
-              >
-                创作者
-              </Chip>
+              <span className="bg-primary text-black px-1 font-bold uppercase">
+                OP
+              </span>
             )}
             {comment.isPinned && !isReply && (
-              <span className="text-primary text-xs font-medium">📌</span>
+              <span className="bg-red-500 text-white px-1 font-bold uppercase">
+                PINNED
+              </span>
             )}
-            <span className="text-foreground-500">
-              {formatDate(comment.createdAt)}
+            <span className="text-foreground/50">
+              [{formatDate(comment.createdAt)}]
             </span>
           </div>
-          <div
-            className={`${comment.isPinned && !isReply ? "bg-primary/10 border border-primary/30 rounded-lg p-3" : ""}`}
-          >
-            <p className="text-pretty leading-relaxed">{comment.content}</p>
+
+          <div className="text-sm text-pretty leading-relaxed break-words mb-3">
+            {comment.content}
           </div>
+
           <div className="flex items-center gap-2">
             {!isReply && currentUserId && (
               <Button
-                className="h-8 px-2"
+                className="h-6 px-2 min-w-0 font-mono text-xs uppercase border border-foreground bg-transparent hover:bg-foreground hover:text-background rounded-none"
+                radius="none"
                 size="sm"
-                variant="light"
-                radius="full"
+                variant="bordered"
                 onPress={() => setShowReplyForm(!showReplyForm)}
               >
-                Reply
+                {showReplyForm ? "Close_Reply" : "Reply"}
               </Button>
             )}
           </div>
 
           {/* 回复表单 */}
           {showReplyForm && currentUserId && (
-            <div className="space-y-2 mt-3">
+            <div className="space-y-2 mt-3 border-t border-dashed border-foreground pt-3">
               <form className="space-y-3" onSubmit={handleSubmitReply}>
                 <Textarea
                   className="min-h-[80px]"
+                  classNames={{
+                    inputWrapper:
+                      "bg-background border border-foreground rounded-none data-[hover=true]:bg-background group-data-[focus=true]:bg-background",
+                  }}
                   maxLength={1000}
                   minRows={2}
-                  placeholder={`Reply to @${comment.author.username}...`}
+                  placeholder={`> Reply to user ${comment.author.username}...`}
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
                 />
 
                 <div className="flex gap-2">
                   <Button
-                    color="primary"
+                    className="bg-foreground text-background font-bold uppercase rounded-none"
                     isDisabled={!replyContent.trim()}
                     isLoading={isSubmittingReply}
+                    radius="none"
                     size="sm"
                     type="submit"
-                    radius="full"
                   >
-                    {isSubmittingReply ? "Posting..." : "Reply"}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="bordered"
-                    radius="full"
-                    onPress={() => {
-                      setShowReplyForm(false);
-                      setReplyContent("");
-                    }}
-                  >
-                    Cancel
+                    {isSubmittingReply ? "SENDING..." : "SEND"}
                   </Button>
                 </div>
               </form>
@@ -196,7 +186,7 @@ export default function CommentItem({
 
       {/* 回复列表 */}
       {comment.replies && comment.replies.length > 0 && (
-        <div className="mt-2 space-y-2">
+        <div className="mt-4 space-y-4">
           {comment.replies.map((reply) => (
             <CommentItem
               key={reply.id}

@@ -36,14 +36,14 @@ export function ImageCarousel({
   };
 
   return (
-    <Card className={className}>
+    <Card className={`${className || ""} rounded-none`} radius="none">
       <CardBody className="p-0">
         {/* Main Image */}
-        <div className="relative aspect-video bg-content2 overflow-hidden rounded-t-lg">
+        <div className="relative aspect-video bg-content2 overflow-hidden border-2 border-foreground">
           <Image
             fill
             alt={`${title} - Image ${currentIndex + 1}`}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain bg-black/5"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             src={images[currentIndex]}
           />
@@ -53,44 +53,44 @@ export function ImageCarousel({
             <>
               <Button
                 isIconOnly
-                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/30 text-white hover:bg-black/50"
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-background/80 text-foreground border-r-2 border-y-2 border-foreground hover:bg-foreground hover:text-background h-12 w-12 rounded-none"
+                radius="none"
                 variant="flat"
-                radius="full"
                 onPress={prevImage}
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-6 h-6" />
               </Button>
               <Button
                 isIconOnly
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/30 text-white hover:bg-black/50"
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-background/80 text-foreground border-l-2 border-y-2 border-foreground hover:bg-foreground hover:text-background h-12 w-12 rounded-none"
+                radius="none"
                 variant="flat"
-                radius="full"
                 onPress={nextImage}
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-6 h-6" />
               </Button>
             </>
           )}
 
           {/* Image Counter */}
           {images.length > 1 && (
-            <div className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
-              {currentIndex + 1} / {images.length}
+            <div className="absolute bottom-0 right-0 bg-foreground text-background text-xs font-mono px-2 py-1 border-l-2 border-t-2 border-foreground">
+              IDX: {currentIndex + 1} / {images.length}
             </div>
           )}
         </div>
 
         {/* Thumbnails */}
         {images.length > 1 && (
-          <div className="p-4">
+          <div className="p-4 border-x-2 border-b-2 border-foreground">
             <div className="flex gap-2 overflow-x-auto">
               {images.map((image, index) => (
                 <button
                   key={index}
-                  className={`flex-shrink-0 w-16 h-12 bg-content3 rounded overflow-hidden transition-opacity relative ${
+                  className={`flex-shrink-0 w-16 h-12 border-2 transition-all relative ${
                     index === currentIndex
-                      ? "ring-2 ring-primary opacity-100"
-                      : "opacity-60 hover:opacity-80"
+                      ? "border-primary opacity-100 grayscale-0"
+                      : "border-foreground/30 opacity-60 grayscale hover:grayscale-0"
                   }`}
                   onClick={() => goToImage(index)}
                 >
